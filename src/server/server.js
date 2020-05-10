@@ -7,10 +7,12 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const queries = require("./queries");
+const location = require("./location");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
+app.use(express.static("dist"));
 
 const port = process.env.PORT || 8080;
 
@@ -19,7 +21,7 @@ app.listen(port, () => {
 })
 
 app.get("/", (req, res) => {
-    res.json({info: 'Node.js, Express, and Postgres API'})
+    res.sendFile("dist/index.html");
 })
 
 app.get("/users", queries.getUsers);
@@ -31,3 +33,5 @@ app.post("/users", queries.createUser);
 app.put("/users/:id", queries.updateUser);
 
 app.delete("/users/:id", queries.deleteUser);
+
+app.get("/city", location.searchForCity);
