@@ -4,8 +4,8 @@ let dbOptions = {};
 
 if (process.env.DATABASE_URL !== undefined) {
     dbOptions = {
-        connectionString: process.env.DATABASE_URL,
-        ssl: true
+        connectionString: process.env.DATABASE_URL
+        // ssl: true
     };
 } else {
     dbOptions = {
