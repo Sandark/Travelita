@@ -1,0 +1,29 @@
+{
+  "name": "travelita-app",
+  "version": "1.0.0",
+  "description": "Capstone project for FND written using nodejs, express, webpack and etc.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sandark/Travel-App-Project.git"
+  },
+  "keywords": [],
+  "author": "Anton Verchenko <anton.verch@gmail.com> (https://github.com/Sandark)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sandark/Travel-App-Project/issues"
+  },
+  "homepage": "https://github.com/Sandark/Travel-App-Project#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "pg": "^8.1.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
