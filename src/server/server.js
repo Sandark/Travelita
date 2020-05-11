@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 
 const queries = require("./queries");
 const location = require("./location");
+const pixabay = require("./pixabay");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -35,3 +36,5 @@ app.put("/users/:id", queries.updateUser);
 app.delete("/users/:id", queries.deleteUser);
 
 app.get("/city", location.searchForCity);
+
+app.get("/img", pixabay.findImageForCity)

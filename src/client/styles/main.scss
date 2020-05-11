@@ -41,6 +41,7 @@ input {
   font-family: $main-font;
   color: #000000;
   text-align: center;
+  outline: none;
 
   &:hover, &:focus {
     border-bottom: 2px solid #5598ff;
