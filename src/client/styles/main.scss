@@ -1,14 +1,11 @@
-$main-background: #ffffff;
-
-$color1: #2b2d42ff;
-$color2: #92afd7ff;
-$color3: #edf2f4ff;
-$color4: #bcf8ecff;
-$color5: #aed9e0ff;
+@import "global.scss";
 
 body {
   font-size: 20px;
-  font-family: 'PT Sans', sans-serif;
+  font-family: $main-font;
+  background: $main-background;
+  padding: 0;
+  margin: 0;
 }
 
 .entry {
@@ -18,33 +15,39 @@ body {
   align-items: center;
 }
 
-.input_box {
-  width: 200px;
-  font-family: inherit;
-  font-size: 1.2em;
-}
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  background-color: $header-color;
+  color: $header-font-color;
 
-.city_search {
-  position: relative;
-
-  .suggestion_box {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-
-    a {
-      padding: 4px 2px;
-      font-size: .8em;
-      text-decoration: none;
-      color: #000000;
-      cursor: pointer;
-      font-family: inherit;
-
-      &:hover {
-        background: $color5;
-      }
-    }
+  .logo {
+    margin: 5px 0;
+    font-size: 1.5em;
+    font-family: $logo-font;
+    user-select: none;
   }
 }
 
+input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 1em;
+  margin-top: 8px;
+  font-family: $main-font;
+  color: #000000;
+  text-align: center;
+
+  &:hover, &:focus {
+    border-bottom: 2px solid #5598ff;
+  }
+
+  &::placeholder {
+    font-family: $main-font;
+    text-align: center;
+  }
+}

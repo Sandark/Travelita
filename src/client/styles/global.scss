@@ -1,0 +1,17 @@
+$main-background: #ffffff;
+
+$main-font: 'Rubik', sans-serif;
+$logo-font: 'DM Mono', monospace;;
+
+$header-color: #2b2d42ff;
+$header-font-color: #92afd7ff;
+$color3: #edf2f4ff;
+$color4: #bcf8ecff;
+$color5: #aed9e0ff;
+
+%background-vertical-gradient {
+  background: -moz-linear-gradient(top, rgba(114, 114, 114, 1) 0%, rgba(14, 14, 14, 0) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(114, 114, 114, 1) 0%, rgba(14, 14, 14, 0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(114, 114, 114, 1) 0%, rgba(14, 14, 14, 0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#727272', endColorstr='#000e0e0e', GradientType=0); /* IE6-9 */
+}

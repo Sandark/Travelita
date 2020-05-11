@@ -3,17 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Travelita</title>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=DM+Mono:wght@300&display=swap"
+          rel="stylesheet">
 </head>
 <body>
 <header>
-
+    <div class="logo">travelita</div>
 </header>
 <main>
-    <div class="entry">
-        <div class="city_search">
-            <input type="text" class="input_box" id="city-search" autocomplete="off">
-            <div class="suggestion_box" id="city-suggestions">
+    <div class="content">
+        <div class="entry">
+            <div class="image_holder">
+                <div class="trip_name">Tallinn</div>
+                <img src="https://cdn.pixabay.com/photo/2015/08/28/18/58/estonia-912315_960_720.jpg" alt="Tallinn">
+            </div>
+            <div class="trip_info">
+                <div class="city_search">
+                    <input type="text" class="input_box" id="city-search" autocomplete="off" placeholder="City">
+                    <div class="suggestion_box" id="city-suggestions">
+                    </div>
+                </div>
+                <div class="dates_selection">
+                    <input type="date" placeholder="FROM">
+                    <input type="date" placeholder="TO">
+                </div>
             </div>
         </div>
     </div>

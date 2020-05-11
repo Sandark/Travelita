@@ -2,7 +2,7 @@
 const citySearchField = document.getElementById("city-search");
 const suggestionBox = document.getElementById("city-suggestions");
 let typingTimer;
-const waitTime = 500;
+const waitTime = 1000;
 
 citySearchField.addEventListener("keyup", () => {
     typingTimer = setTimeout(() => {

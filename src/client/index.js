@@ -3,4 +3,6 @@ import "regenerator-runtime/runtime";
 
 import "./js/app";
 
-import "./styles/main.scss"
+import "./styles/global.scss";
+import "./styles/main.scss";
+import "./styles/content.scss";
