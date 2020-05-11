@@ -4,8 +4,10 @@
   "description": "Capstone project for FND written using nodejs, express, webpack and etc.",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf ./dist && mkdir dist",
     "start": "node src/server/server.js",
-    "build-dev": "webpack --config webpack.config.dev.js"
+    "build-dev": "webpack --config webpack.config.dev.js",
+    "heroku-postbuild": "npm run clean && npm run build-dev"
   },
   "repository": {
     "type": "git",
