@@ -8,6 +8,9 @@ travelEntries.forEach(travelEntry => {
     const travelName = travelEntry.getElementsByClassName("trip_name")[0];
     const citySearch = travelEntry.getElementsByClassName("city_search")[0];
     const citySearchInput = travelEntry.getElementsByClassName("city_search_input")[0];
+    const weatherForecast = travelEntry.getElementsByClassName("weather_forecast")[0];
+    const dateFrom = travelEntry.getElementsByClassName("date_from")[0];
+    const dateTo = travelEntry.getElementsByClassName("date_to")[0];
     let suggestionDiv;
 
     citySearchInput.addEventListener("keyup", () => {
@@ -48,23 +51,56 @@ travelEntries.forEach(travelEntry => {
         clearTimeout(typingTimer);
     })
 
-    function applyCity(evt) {
+    async function applyCity(evt) {
         let e = evt || window.event;
         let target = e.target || e.srcElement;
-        console.log(target);
 
+        closeAllSuggestions();
         citySearchInput.value = target.getAttribute("data-name");
         travelName.textContent = target.getAttribute("data-city");
 
-        getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
-            .then(value => {
-                if (Object.keys(value).length > 0) {
-                    travelImage.src = value.hits[Math.floor(Math.random() * value.hits.length)].webformatURL;
-                    travelImage.alt = target.getAttribute("data-city");
+        await getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
+            .then(async response => {
+                if (response.total === 0) {
+                    return await getRequest(getApiBaseUrl() + "/img", {q: "travel"});
                 }
-            });
+                return response;
+            }).then(response => {
+                travelImage.src = response.hits[Math.floor(Math.random() * response.hits.length)].webformatURL;
+                travelImage.alt = target.getAttribute("data-city");
+            }).then(() => {
+                let startDate = dateFrom.valueAsDate;
 
-        closeAllSuggestions();
+                const diffTime = Math.abs(startDate - new Date());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays >= 16) {
+                    startDate.setDate(startDate.getDate() + 1);
+                    startDate.setFullYear(startDate.getFullYear() - 1);
+                    let nextDate = new Date();
+                    nextDate.setDate(startDate.getDate() + 1);
+                    nextDate.setMonth(startDate.getMonth());
+                    nextDate.setFullYear(startDate.getFullYear());
+
+                    getRequest(getApiBaseUrl() + "/weatherHistory", {
+                        start_date: startDate.toISOString().split('T')[0],
+                        end_date: nextDate.toISOString().split('T')[0],
+                        lat: target.getAttribute("data-lat"),
+                        lng: target.getAttribute("data-lng")
+                    }).then(response => {
+                        weatherForecast.innerText = `Typical weather for those days\nMax: ${response.max_temp} - Min: ${response.min_temp}`;
+                    })
+                } else {
+                    getRequest(getApiBaseUrl() + "/weather", {
+                        lat: target.getAttribute("data-lat"),
+                        lng: target.getAttribute("data-lng")
+                    }).then(response => {
+                        weatherForecast.innerText = response;
+                    })
+                }
+
+
+            });
     }
 
     function closeAllSuggestions() {
@@ -89,5 +125,9 @@ async function getRequest(url, params = "") {
 }
 
 function getApiBaseUrl() {
-    return "http://" + [window.location.hostname, window.location.port].join(":");
+    if (window.location.hostname === "localhost") {
+        return "http://" + [window.location.hostname, window.location.port].join(":")
+    }
+
+    return "https://" + [window.location.hostname, window.location.port].join(":");
 }

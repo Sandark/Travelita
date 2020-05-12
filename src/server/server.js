@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const queries = require("./queries");
 const location = require("./location");
 const pixabay = require("./pixabay");
+const weather = require("./weather");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -37,4 +38,8 @@ app.delete("/users/:id", queries.deleteUser);
 
 app.get("/city", location.searchForCity);
 
-app.get("/img", pixabay.findImageForCity)
+app.get("/img", pixabay.findImageForCity);
+
+app.get("/weather", weather.getWeatherForecast);
+
+app.get("/weatherHistory", weather.getWeatherHistory);

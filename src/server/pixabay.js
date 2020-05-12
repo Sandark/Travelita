@@ -3,10 +3,11 @@ const https = require("https");
 
 /*https://pixabay.com/api/docs/*/
 const baseUrl = "https://pixabay.com/api/";
+const apiKey = process.env.PIXABAY_API_KEY;
 
 const findImageForCity = (req, res) => {
     let params = {
-        key: process.env.PIXABAY_API_KEY,
+        key: apiKey,
         q: req.query.q,
         orientation: "horizontal",
         category: "travel",
