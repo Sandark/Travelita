@@ -1,69 +1,80 @@
 /* City search lookup */
-const citySearchField = document.getElementById("city-search");
-const suggestionBox = document.getElementById("city-suggestions");
+const travelEntries = document.getElementsByClassName("entry");
 let typingTimer;
 const waitTime = 1000;
 
-citySearchField.addEventListener("keyup", () => {
-    typingTimer = setTimeout(() => {
-        if (citySearchField.value.length < 3) {
-            return;
-        }
+travelEntries.forEach(travelEntry => {
+    const travelImage = travelEntry.getElementsByClassName("trip_image")[0];
+    const travelName = travelEntry.getElementsByClassName("trip_name")[0];
+    const citySearch = travelEntry.getElementsByClassName("city_search")[0];
+    const citySearchInput = travelEntry.getElementsByClassName("city_search_input")[0];
+    let suggestionDiv;
 
-        getRequest(getApiBaseUrl() + "/city", {
-            cityName: citySearchField.value
-        }).then(v => {
-            suggestionBox.innerHTML = "";
-            let tempFragment = document.createDocumentFragment();
-            v.geonames.map(g => {
-                let cityFullName = [g.toponymName, g.adminName1, g.countryName].join(",");
+    citySearchInput.addEventListener("keyup", () => {
+        typingTimer = setTimeout(() => {
+            if (citySearchInput.value.length < 3) {
+                return;
+            }
 
-                let cityAnchor = document.createElement("a");
-                cityAnchor.setAttribute("data-city", g.toponymName);
-                cityAnchor.setAttribute("data-name", cityFullName);
-                cityAnchor.setAttribute("data-lng", g.lng);
-                cityAnchor.setAttribute("data-lat", g.lat);
-                cityAnchor.setAttribute("onclick", "Client.applyCity()");
-                cityAnchor.text = cityFullName;
+            getRequest(getApiBaseUrl() + "/city", {
+                cityName: citySearchInput.value
+            }).then(v => {
+                closeAllSuggestions();
+                suggestionDiv = document.createElement("div");
+                suggestionDiv.classList.add("suggestion_box");
+                v.geonames.map(g => {
+                    let cityFullName = [g.toponymName, g.countryName].join(",");
 
-                return cityAnchor;
-            }).forEach(a => {
-                tempFragment.appendChild(a);
+                    let cityAnchor = document.createElement("a");
+                    cityAnchor.setAttribute("data-city", g.toponymName);
+                    cityAnchor.setAttribute("data-name", cityFullName);
+                    cityAnchor.setAttribute("data-lng", g.lng);
+                    cityAnchor.setAttribute("data-lat", g.lat);
+                    cityAnchor.text = cityFullName;
+
+                    cityAnchor.addEventListener("click", applyCity);
+
+                    return cityAnchor;
+                }).forEach(a => {
+                    suggestionDiv.appendChild(a);
+                });
+
+                citySearch.appendChild(suggestionDiv);
+            })
+        }, waitTime);
+    });
+
+    citySearchInput.addEventListener("keydown", () => {
+        clearTimeout(typingTimer);
+    })
+
+    function applyCity(evt) {
+        let e = evt || window.event;
+        let target = e.target || e.srcElement;
+        console.log(target);
+
+        citySearchInput.value = target.getAttribute("data-name");
+        travelName.textContent = target.getAttribute("data-city");
+
+        getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
+            .then(value => {
+                if (Object.keys(value).length > 0) {
+                    travelImage.src = value.hits[Math.floor(Math.random() * value.hits.length)].webformatURL;
+                    travelImage.alt = target.getAttribute("data-city");
+                }
             });
 
-            suggestionBox.appendChild(tempFragment);
-        })
-    }, waitTime);
-});
-
-citySearchField.addEventListener("keydown", () => {
-    clearTimeout(typingTimer);
-})
-
-document.body.addEventListener('click', function (event) {
-    if (!suggestionBox.contains(event.target)) {
-        console.log('clicked inside');
-        suggestionBox.innerHTML = "";
+        closeAllSuggestions();
     }
+
+    function closeAllSuggestions() {
+        let allSuggestions = document.getElementsByClassName("suggestion_box");
+        allSuggestions.forEach(sBox => {
+            sBox.parentNode.removeChild(sBox);
+        })
+    }
+
 });
-
-function applyCity(evt) {
-    let e = evt || window.event;
-    let target = e.target || e.srcElement;
-    console.log(target);
-
-    citySearchField.value = target.getAttribute("data-name");
-
-    getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
-        .then(value => {
-            let url = value.hits[Math.floor(Math.random() * value.hits.length)].webformatURL;
-            document.getElementById("trip_image").src = url;
-            document.getElementById("trip_image").alt = target.getAttribute("data-city");
-            console.log(url);
-        });
-
-    suggestionBox.innerHTML = "";
-}
 
 async function getRequest(url, params = "") {
     let compiledUrl = new URL(url);
@@ -79,8 +90,4 @@ async function getRequest(url, params = "") {
 
 function getApiBaseUrl() {
     return "http://" + [window.location.hostname, window.location.port].join(":");
-}
-
-module.exports = {
-    applyCity
 }

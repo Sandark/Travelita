@@ -23,6 +23,7 @@ header {
   width: 100%;
   background-color: $header-color;
   color: $header-font-color;
+  box-shadow: 0 0 10px $header-color;
 
   .logo {
     margin: 5px 0;

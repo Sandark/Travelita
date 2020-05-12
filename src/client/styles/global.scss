@@ -3,11 +3,26 @@ $main-background: #ffffff;
 $main-font: 'Rubik', sans-serif;
 $logo-font: 'DM Mono', monospace;;
 
-$header-color: #2b2d42ff;
-$header-font-color: #92afd7ff;
+$header-color: #676d93;
+$header-font-color: #c9d8f5;
 $color3: #edf2f4ff;
 $color4: #bcf8ecff;
 $color5: #aed9e0ff;
+
+$breakpoint-small: 768px;
+$breakpoint-big: 1024px;
+
+@mixin middle_screen {
+  @media (min-width: #{$breakpoint-small}) and (max-width: #{$breakpoint-big - 1px}) {
+    @content;
+  }
+}
+
+@mixin big_screen {
+  @media (min-width: #{$breakpoint-big}) {
+    @content;
+  }
+}
 
 %background-vertical-gradient {
   background: -moz-linear-gradient(top, rgba(114, 114, 114, 1) 0%, rgba(14, 14, 14, 0) 100%); /* FF3.6-15 */
