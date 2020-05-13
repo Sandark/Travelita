@@ -8,13 +8,6 @@ body {
   margin: 0;
 }
 
-.entry {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}
-
 header {
   display: flex;
   flex-direction: row;
@@ -24,6 +17,9 @@ header {
   background-color: $header-color;
   color: $header-font-color;
   box-shadow: 0 0 10px $header-color;
+  position: fixed;
+  top: 0;
+  z-index: 999;
 
   .logo {
     margin: 5px 0;
