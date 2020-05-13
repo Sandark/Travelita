@@ -1,8 +1,8 @@
 @import "global.scss";
 
-.content {
+.travel_content {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   width: calc(90% + 16px);
   flex-wrap: wrap;
@@ -103,7 +103,7 @@
 }
 
 @include middle_screen {
-  .content {
+  .travel_content {
     .entry {
       width: calc(100%/2 - 16px);
     }
@@ -111,9 +111,9 @@
 }
 
 @include big_screen {
-  .content {
+  .travel_content {
     .entry {
-      width: calc(100%/3 - 16px);
+      width: calc(100%/2 - 16px);
     }
   }
 }

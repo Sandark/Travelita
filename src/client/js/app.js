@@ -1,9 +1,11 @@
 /* City search lookup */
-const travelEntries = document.getElementsByClassName("entry");
+const travelEntries = document.querySelector(".travel_content");
 let typingTimer;
 const waitTime = 1000;
 
-travelEntries.forEach(travelEntry => {
+function addEventListenersToEntry(entryId) {
+    const travelEntry = document.getElementById(entryId);
+
     const travelImage = travelEntry.getElementsByClassName("trip_image")[0];
     const travelName = travelEntry.getElementsByClassName("trip_name")[0];
     const citySearch = travelEntry.getElementsByClassName("city_search")[0];
@@ -109,8 +111,7 @@ travelEntries.forEach(travelEntry => {
             sBox.parentNode.removeChild(sBox);
         })
     }
-
-});
+}
 
 async function getRequest(url, params = "") {
     let compiledUrl = new URL(url);
@@ -130,4 +131,44 @@ function getApiBaseUrl() {
     }
 
     return "https://" + [window.location.hostname, window.location.port].join(":");
+}
+
+function getEntryHtml(id, img) {
+    return `<div class="entry" id="${id}">
+            <div class="image_holder">
+                
+                <img class="trip_image" src="${img}"
+                     alt="Tallinn">
+                <div class="image_shadow">
+                    <div class="trip_name"></div>
+                    <div class="trip_due_to"></div>
+                </div>
+            </div>
+            <div class="trip_info">
+                <div class="city_search">
+                    <input type="text" class="city_search_input" autocomplete="off" placeholder="City">
+                </div>
+                <div class="dates_selection">
+                    <input class="date_from" type="date" placeholder="FROM">
+                    <input class="date_to" type="date" placeholder="FROM">
+                </div>
+                <div class="weather_forecast">
+
+                </div>
+            </div>
+        </div>`
+}
+
+document.getElementById("create-entry").addEventListener("click", event => {
+    const id = generateId(5);
+    let entryHtml = getEntryHtml(id, "https://cdn.pixabay.com/photo/2020/05/04/16/05/mckenzie-river-5129717_960_720.jpg");
+    let temp = document.createElement('template');
+    temp.innerHTML = entryHtml;
+    travelEntries.append(temp.content);
+
+    addEventListenersToEntry(id);
+});
+
+function generateId(length = 10) {
+    return Array(10).fill(null).map(() => Math.random().toString(36).substr(2)).join('').substr(0, length);
 }

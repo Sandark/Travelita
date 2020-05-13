@@ -53,3 +53,21 @@ input {
     text-align: center;
   }
 }
+
+.button_create_entry {
+  border: none;
+  background: none;
+  font-size: 2em;
+  color: #c9d8f5;
+  outline: none;
+  cursor: pointer;
+  margin-top: -6px;
+
+  &:hover {
+    color: #aec1f3;
+  }
+
+  &:active {
+    color: #7699f1;
+  }
+}
