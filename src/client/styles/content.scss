@@ -18,7 +18,8 @@
     width: 100%;
     border-radius: 10px;
     border: 1px solid #dbdbdb;
-    margin-bottom: 20px;
+    animation-name: entry_creation;
+    animation-duration: 1s;
 
     &:last-child {
       margin-bottom: 0;
@@ -137,6 +138,10 @@
         &:hover, &:focus {
           background: #e0e0e0;
         }
+
+        &:active {
+          background: #c6c6c6;
+        }
       }
 
       .button_delete_entry {
@@ -146,15 +151,31 @@
         &:hover, &:focus {
           background: #ff1919;
         }
+
+        &:active {
+          background: #e70000;
+        }
       }
     }
+  }
+}
+
+@keyframes entry_creation {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
 @include middle_screen {
   .travel_content {
     .entry {
-      width: calc(100% / 2 - 16px);
+      width: calc(100% / 2 - 24px);
     }
   }
 }
@@ -162,7 +183,7 @@
 @include big_screen {
   .travel_content {
     .entry {
-      width: calc(100% / 2 - 16px);
+      width: calc(100% / 2 - 24px);
     }
   }
 }

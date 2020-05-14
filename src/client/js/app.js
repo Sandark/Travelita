@@ -98,7 +98,8 @@ function addEventListenersToEntry(entryId) {
                         lat: target.getAttribute("data-lat"),
                         lng: target.getAttribute("data-lng")
                     }).then(response => {
-                        weatherForecast.innerText = response;
+                        let temperatureAtStartDay = response[diffDays];
+                        weatherForecast.innerText = `Expected temperature at `;
                     })
                 }
 
