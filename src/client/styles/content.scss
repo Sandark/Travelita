@@ -7,6 +7,7 @@
   width: calc(90% + 16px);
   flex-wrap: wrap;
   max-width: 1200px;
+  min-width: 350px;
   margin: 20px auto;
   padding-top: 50px;
 
@@ -34,7 +35,6 @@
       height: 200px;
 
       .trip_name {
-        @extend %background-vertical-gradient;
         position: absolute;
         color: #ffffff;
         font-weight: 200;
@@ -42,6 +42,22 @@
         width: 100%;
         text-align: center;
         padding: 5px;
+        box-sizing: border-box;
+        z-index: 100;
+      }
+
+      .trip_due_days {
+        @extend %background-vertical-gradient;
+        position: absolute;
+        padding-top: 40px;
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        text-transform: uppercase;
+        font-style: italic;
+        font-size: 0.75em;
+        color: #ececec;
       }
 
       img {

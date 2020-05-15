@@ -19,8 +19,8 @@ if (process.env.DATABASE_URL !== undefined) {
 
 const pool = new Pool(dbOptions);
 
-const getUsers = (request, response) => {
-    pool.query('SELECT * FROM tr_user ORDER BY id ASC', (error, results) => {
+const getTrips = (request, response) => {
+    pool.query('SELECT * FROM TRIP ORDER BY ID ASC', (error, results) => {
         if (error) {
             throw error
         }
@@ -29,10 +29,10 @@ const getUsers = (request, response) => {
 }
 
 
-const getUserById = (request, response) => {
+const getTripById = (request, response) => {
     const id = parseInt(request.params.id)
 
-    pool.query('SELECT * FROM tr_user WHERE id = $1', [id], (error, results) => {
+    pool.query('SELECT * FROM TRIP WHERE id = $1', [id], (error, results) => {
         if (error) {
             throw error
         }
@@ -40,48 +40,49 @@ const getUserById = (request, response) => {
     })
 }
 
-const createUser = (request, response) => {
-    const { name, email } = request.body
+const createTrip = (request, response) => {
+    const { name, city_full_name, img_src, from_date, to_date } = request.body
 
-    pool.query('INSERT INTO tr_user (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
+    pool.query('INSERT INTO TRIP (NAME, CITY_FULL_NAME, IMG_SRC, FROM_DATE, TO_DATE) VALUES ($1, $2, $3, $4, $5)',
+        [name, city_full_name, img_src, from_date, to_date], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(201).send(`User added with ID: ${result.insertId}`)
+        response.status(201).send(`Trip added with ID: ${result.insertId}`)
     })
 }
 
-const updateUser = (request, response) => {
+const updateTrip = (request, response) => {
     const id = parseInt(request.params.id)
-    const { name, email } = request.body
+    const { name, city_full_name, img_src, from_date, to_date } = request.body
 
     pool.query(
-        'UPDATE tr_user SET name = $1, email = $2 WHERE id = $3',
-        [name, email, id],
+        'UPDATE TRIP SET name = $1, city_full_name = $2, img_src = $3, from_date = $4, to_date = $5 WHERE id = $3',
+        [name, city_full_name, img_src, from_date, to_date, id],
         (error, results) => {
             if (error) {
                 throw error
             }
-            response.status(200).send(`User modified with ID: ${id}`)
+            response.status(200).send(`Trip modified with ID: ${id}`)
         }
     )
 }
 
-const deleteUser = (request, response) => {
+const deleteTrip = (request, response) => {
     const id = parseInt(request.params.id)
 
-    pool.query('DELETE FROM tr_user WHERE id = $1', [id], (error, results) => {
+    pool.query('DELETE FROM TRIP WHERE id = $1', [id], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).send(`User deleted with ID: ${id}`)
+        response.status(200).send(`Trip deleted with ID: ${id}`)
     })
 }
 
 module.exports = {
-    getUsers,
-    getUserById,
-    createUser,
-    updateUser,
-    deleteUser,
+    getTrips,
+    getTripById,
+    createTrip,
+    updateTrip,
+    deleteTrip
 }

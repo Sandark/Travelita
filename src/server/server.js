@@ -26,15 +26,15 @@ app.get("/", (req, res) => {
     res.sendFile("dist/index.html");
 })
 
-app.get("/users", queries.getUsers);
+app.get("/trips", queries.getTrips);
 
-app.get("/users/:id", queries.getUserById);
+app.get("/trips/:id", queries.getTripById);
 
-app.post("/users", queries.createUser);
+app.post("/trips", queries.createTrip);
 
-app.put("/users/:id", queries.updateUser);
+app.put("/trips/:id", queries.updateTrip);
 
-app.delete("/users/:id", queries.deleteUser);
+app.delete("/trips/:id", queries.deleteTrip);
 
 app.get("/city", location.searchForCity);
 
