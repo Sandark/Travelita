@@ -1,4 +1,4 @@
-
+/* HTTP requests, returns promises as result */
 
 async function getRequest(url, params = "") {
     let compiledUrl = new URL(url);
@@ -12,14 +12,45 @@ async function getRequest(url, params = "") {
     }
 }
 
-function deleteRequest(id, url) {
-    return fetch(url + '/' + id, {
+const postRequest = async function (url, load) {
+    const response = await fetch(url, {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(load)
+    });
+
+    return await response.json();
+}
+
+const putRequest = async function (url, load) {
+    const response = await fetch(url, {
+        method: "PUT",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(load)
+    });
+
+    return await response.json();
+}
+
+async function deleteRequest(id, url) {
+    return await fetch(url + '/' + id, {
         method: 'delete'
-    })
-        .then(response => response.json());
+    });
 }
 
 module.exports = {
     getRequest,
-    deleteRequest
+    deleteRequest,
+    postRequest,
+    putRequest
 }

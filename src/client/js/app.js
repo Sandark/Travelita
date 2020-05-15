@@ -3,29 +3,35 @@ const httpRequest = require("./httpRequest");
 /* City search lookup */
 const travelEntries = document.querySelector(".travel_content");
 
-function assignTripEntryFunctions(entryParams) {
+function assignTripEntryFunctions(elementId, entryParams) {
     let typingTimer;
     const waitTime = 1000;
 
-    const travelEntry = document.getElementById(entryParams.id);
+    const tripEntry = document.getElementById(elementId);
 
-    const tripImage = travelEntry.getElementsByClassName("trip_image")[0];
-    const travelName = travelEntry.getElementsByClassName("trip_name")[0];
-    const dueDays = travelEntry.getElementsByClassName("trip_due_days")[0];
-    const citySearch = travelEntry.getElementsByClassName("city_search")[0];
-    const citySearchInput = travelEntry.getElementsByClassName("city_search_input")[0];
-    const weatherForecast = travelEntry.getElementsByClassName("weather_forecast")[0];
-    const dateFrom = travelEntry.getElementsByClassName("date_from")[0];
-    const dateTo = travelEntry.getElementsByClassName("date_to")[0];
-    const deleteEntry = travelEntry.getElementsByClassName("button_delete_entry")[0];
+    const tripImage = tripEntry.getElementsByClassName("trip_image")[0];
+    const tripName = tripEntry.getElementsByClassName("trip_name")[0];
+    const dueDays = tripEntry.getElementsByClassName("trip_due_days")[0];
+    const citySearch = tripEntry.getElementsByClassName("city_search")[0];
+    const citySearchInput = tripEntry.getElementsByClassName("city_search_input")[0];
+    const weatherForecast = tripEntry.getElementsByClassName("weather_forecast")[0];
+    const dateFrom = tripEntry.getElementsByClassName("date_from")[0];
+    const dateTo = tripEntry.getElementsByClassName("date_to")[0];
+    const deleteEntryButton = tripEntry.getElementsByClassName("button_delete_entry")[0];
+    const saveEntryButton = tripEntry.getElementsByClassName("button_save_entry")[0];
+
     let suggestionDiv;
+
+    if (entryParams.id) {
+        tripEntry.setAttribute("data-id", entryParams.id);
+    }
 
     if (entryParams.img_src) {
         tripImage.src = entryParams.img_src;
     }
 
     if (entryParams.name) {
-        travelName.innerText = entryParams.name;
+        tripName.innerText = entryParams.name;
         tripImage.alt = entryParams.name;
     }
 
@@ -87,7 +93,7 @@ function assignTripEntryFunctions(entryParams) {
 
         closeAllSuggestions();
         citySearchInput.value = target.getAttribute("data-name");
-        travelName.textContent = target.getAttribute("data-city");
+        tripName.textContent = target.getAttribute("data-city");
 
         await httpRequest.getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
             .then(async response => {
@@ -103,8 +109,8 @@ function assignTripEntryFunctions(entryParams) {
             });
     }
 
-    function retrieveWeather(target) {
-        if(dateFrom.value === undefined || dateTo.value === undefined) {
+    function retrieveWeather() {
+        if (dateFrom.valueAsDate === null || dateTo.valueAsDate === null) {
             return;
         }
         let startDate = dateFrom.valueAsDate;
@@ -123,25 +129,51 @@ function assignTripEntryFunctions(entryParams) {
             httpRequest.getRequest(getApiBaseUrl() + "/weatherHistory", {
                 start_date: startDate.toISOString().split('T')[0],
                 end_date: nextDate.toISOString().split('T')[0],
-                lat: target.getAttribute("data-lat"),
-                lng: target.getAttribute("data-lng")
+                lat: tripEntry.getAttribute("data-lat"),
+                lng: tripEntry.getAttribute("data-lng")
             }).then(response => {
                 weatherForecast.innerText = `Typical weather for those days\nMax: ${response.max_temp} - Min: ${response.min_temp}`;
             })
         } else {
             httpRequest.getRequest(getApiBaseUrl() + "/weather", {
-                lat: target.getAttribute("data-lat"),
-                lng: target.getAttribute("data-lng")
+                lat: tripEntry.getAttribute("data-lat"),
+                lng: tripEntry.getAttribute("data-lng")
             }).then(response => {
                 let temperatureAtStartDay = response[diffDays];
-                weatherForecast.innerText = `Expected temperature at `;
+                weatherForecast.innerText = `Expected temperature: `;
             })
         }
     }
 
-    deleteEntry.addEventListener("click", () => {
-        travelEntry.parentNode.removeChild(travelEntry);
-    })
+    deleteEntryButton.addEventListener("click", () => {
+        tripEntry.parentNode.removeChild(tripEntry);
+        if (tripEntry.getAttribute("data-id")) {
+            httpRequest.deleteRequest(tripEntry.getAttribute("data-id"), getApiBaseUrl() + "/trips")
+                .then(res => console.log(res));
+        }
+    });
+
+    saveEntryButton.addEventListener("click", () => {
+        let techId = tripEntry.getAttribute("data-elementId");
+        const saveParams = {
+            id: techId,
+            name: tripName.innerText,
+            img_src: tripImage.src,
+            city_full_name: citySearchInput.value,
+            from_date: dateFrom.valueAsDate,
+            to_date: dateTo.valueAsDate
+        }
+
+        if (techId) {
+            httpRequest.putRequest(getApiBaseUrl() + `/trips/${techId}`, saveParams);
+        } else {
+            httpRequest.postRequest(getApiBaseUrl() + "/trips", saveParams)
+                .then(res => {
+                    tripEntry.setAttribute("data-id", res.id);
+                    console.log(res.message);
+                });
+        }
+    });
 
     function closeAllSuggestions() {
         let allSuggestions = document.getElementsByClassName("suggestion_box");
@@ -151,9 +183,12 @@ function assignTripEntryFunctions(entryParams) {
     }
 
     function generateDueDays() {
-        const diffTime = Math.abs(dateFrom.valueAsDate - new Date());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const tripStartDate = dateFrom.valueAsDate;
+        const now = new Date();
 
+        const diffTime = tripStartDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
         if (diffDays === 1) {
             return "Tomorrow"
         } else if (diffDays > 1) {
@@ -161,8 +196,12 @@ function assignTripEntryFunctions(entryParams) {
         } else if (diffDays === 0) {
             return "Today";
         } else {
-            const diffEndTime = Math.abs(dateTo.valueAsDate - new Date());
-            const diffEndDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return calculatePastTripDiff();
+        }
+
+        function calculatePastTripDiff() {
+            const diffEndTime = Math.abs(dateTo.valueAsDate - now);
+            const diffEndDays = Math.ceil(diffEndTime / (1000 * 60 * 60 * 24));
 
             if (diffEndDays === 0) {
                 return "Ending today";
@@ -172,8 +211,6 @@ function assignTripEntryFunctions(entryParams) {
         }
     }
 }
-
-
 
 
 function formatDate(date) {
@@ -217,18 +254,17 @@ function getEntryHtml(id) {
         </div>`
 }
 
-function createEntry(entryParams) {
-    let entryHtml = getEntryHtml(entryParams.id);
+function createEntry(entryParams, elementId = generateId(5)) {
+    let entryHtml = getEntryHtml(elementId);
     let temp = document.createElement('template');
     temp.innerHTML = entryHtml;
     travelEntries.append(temp.content);
 
-    assignTripEntryFunctions(entryParams);
+    assignTripEntryFunctions(elementId, entryParams);
 }
 
-document.getElementById("create-entry").addEventListener("click", event => {
+document.getElementById("create-entry").addEventListener("click", () => {
     createEntry({
-        id: generateId(5),
         img_src: "https://cdn.pixabay.com/photo/2020/05/04/16/05/mckenzie-river-5129717_960_720.jpg"
     });
 });
