@@ -1,0 +1,55 @@
+
+.weather_forecast {
+  min-height: 80px;
+  display: flex;
+  flex-direction: row;
+
+  .weather_icon {
+    width: 50px;
+    height: 50px;
+    margin: 15px;
+    flex-shrink: 0;
+
+    &.sun {
+      background-image: url("../img/sun.png");
+    }
+
+    &.clouds {
+      background-image: url("../img/clouds.png");
+    }
+
+    &.dust {
+      background-image: url("../img/dust.png");
+    }
+
+    &.fog {
+      background-image: url("../img/fog.png");
+    }
+
+    &.haze {
+      background-image: url("../img/haze.png");
+    }
+
+    &.icy {
+      background-image: url("../img/icy.png");
+    }
+
+    &.rain {
+      background-image: url("../img/rain.png");
+    }
+
+    &.storm {
+      background-image: url("../img/storm.png");
+    }
+
+    &.show {
+      background-image: url("../img/show.png");
+    }
+  }
+
+  .weather_temps {
+    font-size: 1.25em;
+    font-weight: 200;
+    margin: 15px;
+  }
+}

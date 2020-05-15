@@ -1,4 +1,5 @@
 const httpRequest = require("./httpRequest");
+const weatherCodesMapping = require("./weatherCodeMapping");
 
 /* City search lookup */
 const travelEntries = document.querySelector(".travel_content");
@@ -14,7 +15,8 @@ function assignTripEntryFunctions(elementId, entryParams) {
     const dueDays = tripEntry.getElementsByClassName("trip_due_days")[0];
     const citySearch = tripEntry.getElementsByClassName("city_search")[0];
     const citySearchInput = tripEntry.getElementsByClassName("city_search_input")[0];
-    const weatherForecast = tripEntry.getElementsByClassName("weather_forecast")[0];
+    const weatherTemps = tripEntry.getElementsByClassName("weather_temps")[0];
+    const weatherIcon = tripEntry.getElementsByClassName("weather_icon")[0];
     const dateFrom = tripEntry.getElementsByClassName("date_from")[0];
     const dateTo = tripEntry.getElementsByClassName("date_to")[0];
     const deleteEntryButton = tripEntry.getElementsByClassName("button_delete_entry")[0];
@@ -45,13 +47,18 @@ function assignTripEntryFunctions(elementId, entryParams) {
         dueDays.innerText = generateDueDays();
     }
 
+    if (entryParams.lat !== undefined && entryParams.lng !== undefined) {
+        tripEntry.setAttribute("data-lat", entryParams.lat);
+        tripEntry.setAttribute("data-lng", entryParams.lng);
+    }
+
     citySearchInput.addEventListener("keyup", () => {
         typingTimer = setTimeout(() => {
             if (citySearchInput.value.length < 3) {
                 return;
             }
 
-            httpRequest.getRequest(getApiBaseUrl() + "/city", {
+            httpRequest.getRequest("/city", {
                 cityName: citySearchInput.value
             }).then(v => {
                 createSuggestionBox(v);
@@ -93,87 +100,73 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
         closeAllSuggestions();
         citySearchInput.value = target.getAttribute("data-name");
+        tripEntry.setAttribute("data-lat", target.getAttribute("data-lat"));
+        tripEntry.setAttribute("data-lng", target.getAttribute("data-lng"));
         tripName.textContent = target.getAttribute("data-city");
 
-        await httpRequest.getRequest(getApiBaseUrl() + "/img", {q: target.getAttribute("data-city")})
+        await httpRequest.getRequest("/img", {q: target.getAttribute("data-city")})
             .then(async response => {
                 if (response.total === 0) {
-                    return await getRequest(getApiBaseUrl() + "/img", {q: "travel"});
+                    return await getRequest("/img", {q: "travel"});
                 }
                 return response;
             }).then(response => {
                 tripImage.src = response.hits[Math.floor(Math.random() * response.hits.length)].webformatURL;
                 tripImage.alt = target.getAttribute("data-city");
             }).then(() => {
-                retrieveWeather(target);
+                requestWeather();
             });
-    }
-
-    function retrieveWeather() {
-        if (dateFrom.valueAsDate === null || dateTo.valueAsDate === null) {
-            return;
-        }
-        let startDate = dateFrom.valueAsDate;
-
-        const diffTime = Math.abs(startDate - new Date());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays >= 16) {
-            startDate.setDate(startDate.getDate() + 1);
-            startDate.setFullYear(startDate.getFullYear() - 1);
-            let nextDate = new Date();
-            nextDate.setDate(startDate.getDate() + 1);
-            nextDate.setMonth(startDate.getMonth());
-            nextDate.setFullYear(startDate.getFullYear());
-
-            httpRequest.getRequest(getApiBaseUrl() + "/weatherHistory", {
-                start_date: startDate.toISOString().split('T')[0],
-                end_date: nextDate.toISOString().split('T')[0],
-                lat: tripEntry.getAttribute("data-lat"),
-                lng: tripEntry.getAttribute("data-lng")
-            }).then(response => {
-                weatherForecast.innerText = `Typical weather for those days\nMax: ${response.max_temp} - Min: ${response.min_temp}`;
-            })
-        } else {
-            httpRequest.getRequest(getApiBaseUrl() + "/weather", {
-                lat: tripEntry.getAttribute("data-lat"),
-                lng: tripEntry.getAttribute("data-lng")
-            }).then(response => {
-                let temperatureAtStartDay = response[diffDays];
-                weatherForecast.innerText = `Expected temperature: `;
-            })
-        }
     }
 
     deleteEntryButton.addEventListener("click", () => {
         tripEntry.parentNode.removeChild(tripEntry);
         if (tripEntry.getAttribute("data-id")) {
-            httpRequest.deleteRequest(tripEntry.getAttribute("data-id"), getApiBaseUrl() + "/trips")
+            httpRequest.deleteRequest("/trips", tripEntry.getAttribute("data-id"))
                 .then(res => console.log(res));
         }
     });
 
     saveEntryButton.addEventListener("click", () => {
-        let techId = tripEntry.getAttribute("data-elementId");
+        let techId = tripEntry.getAttribute("data-id");
         const saveParams = {
             id: techId,
             name: tripName.innerText,
             img_src: tripImage.src,
             city_full_name: citySearchInput.value,
             from_date: dateFrom.valueAsDate,
-            to_date: dateTo.valueAsDate
+            to_date: dateTo.valueAsDate,
+            lat: tripEntry.getAttribute("data-lat"),
+            lng: tripEntry.getAttribute("data-lng")
         }
 
         if (techId) {
-            httpRequest.putRequest(getApiBaseUrl() + `/trips/${techId}`, saveParams);
+            httpRequest.putRequest(`/trips/${techId}`, saveParams);
         } else {
-            httpRequest.postRequest(getApiBaseUrl() + "/trips", saveParams)
+            httpRequest.postRequest("/trips", saveParams)
                 .then(res => {
                     tripEntry.setAttribute("data-id", res.id);
                     console.log(res.message);
                 });
         }
     });
+
+    dateFrom.addEventListener("change", () => {
+        if (dateFrom.valueAsDate > dateTo.valueAsDate) {
+            dateTo.value = formatDate(dateFrom.valueAsDate);
+        }
+
+        generateDueDays();
+        requestWeather();
+    })
+
+    dateTo.addEventListener("change", () => {
+        if (dateTo.valueAsDate < dateFrom.valueAsDate) {
+            dateFrom.value = formatDate(dateTo.valueAsDate);
+        }
+
+        generateDueDays();
+        requestWeather();
+    })
 
     function closeAllSuggestions() {
         let allSuggestions = document.getElementsByClassName("suggestion_box");
@@ -183,12 +176,12 @@ function assignTripEntryFunctions(elementId, entryParams) {
     }
 
     function generateDueDays() {
-        const tripStartDate = dateFrom.valueAsDate;
-        const now = new Date();
+        if (dateFrom.valueAsDate === null || dateTo.valueAsDate === null) {
+            return;
+        }
 
-        const diffTime = tripStartDate - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+        const diffDays = getDateDiffs(dateFrom.valueAsDate, new Date());
+
         if (diffDays === 1) {
             return "Tomorrow"
         } else if (diffDays > 1) {
@@ -200,8 +193,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
         }
 
         function calculatePastTripDiff() {
-            const diffEndTime = Math.abs(dateTo.valueAsDate - now);
-            const diffEndDays = Math.ceil(diffEndTime / (1000 * 60 * 60 * 24));
+            const diffEndDays = Math.abs(getDateDiffs(dateTo.valueAsDate, new Date()));
 
             if (diffEndDays === 0) {
                 return "Ending today";
@@ -210,20 +202,47 @@ function assignTripEntryFunctions(elementId, entryParams) {
             }
         }
     }
+
+    function requestWeather() {
+        if (dateFrom.valueAsDate === null || dateTo.valueAsDate === null) {
+            return;
+        }
+        let startDate = dateFrom.valueAsDate;
+
+        const diffDays = Math.abs(getDateDiffs(startDate, new Date()));
+
+        if (diffDays >= 16) {
+            startDate.setDate(startDate.getDate());
+            startDate.setFullYear(startDate.getFullYear() - 1);
+
+            httpRequest.getRequest("/weatherHistory", {
+                start_date: startDate.toISOString().split('T')[0],
+                lat: tripEntry.getAttribute("data-lat"),
+                lng: tripEntry.getAttribute("data-lng")
+            }).then(response => {
+                weatherTemps.innerText = `Usual weather:\n${response.min_temp}°C / ${response.max_temp}°C`;
+            })
+        } else {
+            httpRequest.getRequest("/weather", {
+                lat: tripEntry.getAttribute("data-lat"),
+                lng: tripEntry.getAttribute("data-lng")
+            }).then(response => {
+                let temperatureAtFirstDay = response[diffDays];
+                weatherTemps.innerText = `Forecast:\n${temperatureAtFirstDay.min_temp}°C / ${temperatureAtFirstDay.max_temp}°C`;
+                weatherIcon.classList.add(weatherCodesMapping.getClassFromWeatherCode(temperatureAtFirstDay.weather_code));
+            })
+        }
+    }
 }
 
+function getDateDiffs(startDate) {
+    const diffTime = startDate - new Date();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
 
 function formatDate(date) {
     return date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) +
         '-' + date.getDate().toString().padStart(2, 0);
-}
-
-function getApiBaseUrl() {
-    if (window.location.hostname === "localhost") {
-        return "http://" + [window.location.hostname, window.location.port].join(":")
-    }
-
-    return "https://" + [window.location.hostname, window.location.port].join(":");
 }
 
 function getEntryHtml(id) {
@@ -248,7 +267,8 @@ function getEntryHtml(id) {
                     <input class="date_to" type="date" placeholder="FROM">
                 </div>
                 <div class="weather_forecast">
-
+                    <div class="weather_icon"></div>
+                    <div class="weather_temps"></div>
                 </div>
             </div>
         </div>`
@@ -275,7 +295,7 @@ function generateId(length = 10) {
 
 /* Load existing data */
 setTimeout(() => {
-    httpRequest.getRequest(getApiBaseUrl() + "/trips")
+    httpRequest.getRequest("/trips")
         .then(trips => {
             trips.forEach(trip => {
                 createEntry(trip)

@@ -41,27 +41,27 @@ const getTripById = (request, response) => {
 }
 
 const createTrip = (request, response) => {
-    const {name, city_full_name, img_src, from_date, to_date} = request.body
+    const {name, city_full_name, img_src, from_date, to_date, lat, lng} = request.body
 
-    pool.query('INSERT INTO TRIP (NAME, CITY_FULL_NAME, IMG_SRC, FROM_DATE, TO_DATE) VALUES ($1, $2, $3, $4, $5)',
-        [name, city_full_name, img_src, from_date, to_date], (error, result) => {
+    pool.query('INSERT INTO TRIP (NAME, CITY_FULL_NAME, IMG_SRC, FROM_DATE, TO_DATE, LAT, LNG) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [name, city_full_name, img_src, from_date, to_date, lat, lng], (error, result) => {
             if (error) {
                 throw error
             }
             response.status(201).json({
-                id: result.insertId,
-                message: `Trip added with ID: ${result.insertId}`
+                id: result.rows[0].id,
+                message: `Trip added with ID: ${result.rows[0].id}`
             });
         })
 }
 
 const updateTrip = (request, response) => {
     const id = parseInt(request.params.id)
-    const {name, city_full_name, img_src, from_date, to_date} = request.body
+    const {name, city_full_name, img_src, from_date, to_date, lat, lng} = request.body
 
     pool.query(
-        'UPDATE TRIP SET name = $1, city_full_name = $2, img_src = $3, from_date = $4, to_date = $5 WHERE id = $3',
-        [name, city_full_name, img_src, from_date, to_date, id],
+        'UPDATE TRIP SET name = $1, city_full_name = $2, img_src = $3, from_date = $4, to_date = $5, lat = $6, lng = $7 WHERE id = $3',
+        [name, city_full_name, img_src, from_date, to_date, id, lat, lng],
         (error, results) => {
             if (error) {
                 throw error

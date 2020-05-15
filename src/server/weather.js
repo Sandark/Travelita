@@ -17,15 +17,31 @@ const getWeatherForecast = (req, res) => {
     let url = support.compileUrl(dailyBaseUrl, params);
 
     httpRequest.httpsGet(url,
-        (data) => res.json(JSON.parse(data)),
+        (data) => {
+            let filteredData = [];
+
+            JSON.parse(data).data.forEach(temp => {
+                filteredData.push({
+                    max_temp: temp.max_temp,
+                    min_temp: temp.min_temp,
+                    weather_code: temp.weather.code,
+                    date: temp.valid_date
+                });
+            })
+
+            res.json(filteredData);
+        },
         (error) => res.json(error));
 }
 
 const getWeatherHistory = (req, res) => {
+    let endDate = new Date(req.query.start_date);
+    endDate.setDate(endDate.getDate() + 1);
+
     let params = {
         key: apiKey,
         start_date: req.query.start_date,
-        end_date: req.query.end_date,
+        end_date: endDate.toISOString().split("T")[0],
         lat: req.query.lat,
         lon: req.query.lng
     }
