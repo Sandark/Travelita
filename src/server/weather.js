@@ -1,5 +1,5 @@
 const support = require("./support");
-const https = require("https");
+const httpRequest = require("./httpRequest");
 
 /* */
 const dailyBaseUrl = "https://api.weatherbit.io/v2.0/forecast/daily";
@@ -15,23 +15,10 @@ const getWeatherForecast = (req, res) => {
     }
 
     let url = support.compileUrl(dailyBaseUrl, params);
-    console.log(`Request with ${url}`);
 
-    https.get(url, externalRes => {
-        let data = "";
-        externalRes.on('data', (chunk) => {
-            data += chunk;
-        })
-
-        externalRes.on("end", () => {
-            console.log(data);
-            res.json(JSON.parse(data));
-        })
-
-        externalRes.on("error", (error) => {
-            res.json(error);
-        })
-    })
+    httpRequest.httpsGet(url,
+        (data) => res.json(JSON.parse(data)),
+        (error) => res.json(error));
 }
 
 const getWeatherHistory = (req, res) => {
@@ -44,28 +31,17 @@ const getWeatherHistory = (req, res) => {
     }
 
     let url = support.compileUrl(historicalBaseUrl, params);
-    console.log(`Request with ${url}`);
 
-    https.get(url, externalRes => {
-        let data = "";
-        externalRes.on('data', (chunk) => {
-            data += chunk;
-        })
-
-        externalRes.on("end", () => {
-            console.log(data);
-
+    httpRequest.httpsGet(url,
+        (data) => {
             let result = JSON.parse(data);
+
             res.json({
                 max_temp: result.data[0].max_temp,
                 min_temp: result.data[0].min_temp
             });
-        })
-
-        externalRes.on("error", (error) => {
-            res.json(error);
-        })
-    })
+        },
+        (error) => res.json(error));
 }
 
 module.exports = {

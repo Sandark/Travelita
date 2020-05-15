@@ -1,5 +1,5 @@
 const support = require("./support");
-const https = require("https");
+const httpRequest = require("./httpRequest");
 
 /*https://pixabay.com/api/docs/*/
 const baseUrl = "https://pixabay.com/api/";
@@ -17,23 +17,10 @@ const findImageForCity = (req, res) => {
     }
 
     let url = support.compileUrl(baseUrl, params);
-    console.log(`Request with ${url}`);
 
-    https.get(url, externalRes => {
-        let data = "";
-        externalRes.on('data', (chunk) => {
-            data += chunk;
-        })
-
-        externalRes.on("end", () => {
-            console.log(data);
-            res.json(JSON.parse(data));
-        })
-
-        externalRes.on("error", (error) => {
-            res.json(error);
-        })
-    })
+    httpRequest.httpsGet(url,
+        (data) => res.json(JSON.parse(data)),
+        (error) => res.json(error));
 }
 
 module.exports = {
