@@ -1,14 +1,22 @@
+$icon_size: 28px;
 
 .weather_forecast {
-  min-height: 80px;
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
+  color: #ffffff;
+  padding-top: 12px;
+  padding-right: 15px;
 
   .weather_icon {
-    width: 50px;
-    height: 50px;
-    margin: 0 15px;
+    width: $icon_size;
+    height: $icon_size;
+    background-repeat: no-repeat;
+    background-size: $icon_size;
+    margin: 0 6px;
     flex-shrink: 0;
 
     &.sun {
@@ -43,13 +51,13 @@
       background-image: url("../img/storm.png");
     }
 
-    &.show {
-      background-image: url("../img/show.png");
+    &.snow {
+      background-image: url("../img/snow.png");
     }
   }
 
   .weather_temps {
-    font-size: 1.25em;
+    font-size: 1em;
     font-weight: 200;
     margin: 0 15px;
   }

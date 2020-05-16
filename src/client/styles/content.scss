@@ -31,40 +31,14 @@
       border-top-right-radius: 10px;
       height: 200px;
 
-      .trip_name {
-        position: absolute;
-        color: #ffffff;
-        font-weight: 200;
-        font-size: 1.5em;
-        width: 100%;
-        text-align: center;
-        text-transform: capitalize;
-        padding: 5px;
-        box-sizing: border-box;
-        z-index: 100;
-      }
-
-      .trip_due_days {
-        @extend %background-vertical-gradient;
-        position: absolute;
-        padding-top: 40px;
-        top: 0;
-        left: 0;
-        right: 0;
-        text-align: center;
-        text-transform: uppercase;
-        font-style: italic;
-        font-size: 0.75em;
-        color: #ececec;
-      }
-
       img {
         height: 100%;
         width: 100%;
         object-fit: cover;
+        background: $header-color;
       }
 
-      .image_shadow {
+      .image_cover {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -73,6 +47,33 @@
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
         transition: background-color 0.5s ease;
+
+        .trip_name {
+          position: absolute;
+          color: #ffffff;
+          font-weight: 200;
+          font-size: 1.5em;
+          width: 100%;
+          text-transform: capitalize;
+          padding: 5px 15px;
+          box-sizing: border-box;
+          z-index: 100;
+          margin: 0;
+        }
+
+        .trip_due_days {
+          @extend %background-vertical-gradient;
+          position: absolute;
+          padding-top: 40px;
+          top: 0;
+          left: 0;
+          right: 0;
+          text-transform: uppercase;
+          font-style: italic;
+          font-size: 0.75em;
+          color: #ececec;
+          padding-left: 15px;
+        }
       }
     }
 
@@ -124,7 +125,7 @@
     }
 
     &:hover {
-      .image_shadow {
+      .image_cover {
         background: rgba(0, 0, 0, 0.3);
       }
     }

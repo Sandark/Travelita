@@ -14,24 +14,31 @@ const getWeatherForecast = (req, res) => {
         lon: req.query.lng
     }
 
-    let url = support.compileUrl(dailyBaseUrl, params);
+    if (isNaN(params.lat) || isNaN(params.lon)) {
+        res.status(400).send({
+            message: "Lat/Lng parameters are missing or wrong"
+        })
+    } else {
 
-    httpRequest.httpsGet(url,
-        (data) => {
-            let filteredData = [];
+        let url = support.compileUrl(dailyBaseUrl, params);
 
-            JSON.parse(data).data.forEach(temp => {
-                filteredData.push({
-                    max_temp: temp.max_temp,
-                    min_temp: temp.min_temp,
-                    weather_code: temp.weather.code,
-                    date: temp.valid_date
-                });
-            })
+        httpRequest.httpsGet(url,
+            (data) => {
+                let filteredData = [];
 
-            res.json(filteredData);
-        },
-        (error) => res.json(error));
+                JSON.parse(data).data.forEach(temp => {
+                    filteredData.push({
+                        max_temp: temp.max_temp,
+                        min_temp: temp.min_temp,
+                        weather_code: temp.weather.code,
+                        date: temp.valid_date
+                    });
+                })
+
+                res.json(filteredData);
+            },
+            (error) => res.json(error));
+    }
 }
 
 const getWeatherHistory = (req, res) => {
@@ -46,18 +53,25 @@ const getWeatherHistory = (req, res) => {
         lon: req.query.lng
     }
 
-    let url = support.compileUrl(historicalBaseUrl, params);
+    if (isNaN(params.lat) || isNaN(params.lon)) {
+        res.status(400).send({
+            message: "Lat/Lng parameters are missing or wrong"
+        })
+    } else {
 
-    httpRequest.httpsGet(url,
-        (data) => {
-            let result = JSON.parse(data);
+        let url = support.compileUrl(historicalBaseUrl, params);
 
-            res.json({
-                max_temp: result.data[0].max_temp,
-                min_temp: result.data[0].min_temp
-            });
-        },
-        (error) => res.json(error));
+        httpRequest.httpsGet(url,
+            (data) => {
+                let result = JSON.parse(data);
+
+                res.json({
+                    max_temp: result.data[0].max_temp,
+                    min_temp: result.data[0].min_temp
+                });
+            },
+            (error) => res.json(error));
+    }
 }
 
 module.exports = {

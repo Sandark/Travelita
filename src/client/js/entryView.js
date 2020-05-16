@@ -3,9 +3,13 @@ function getEntryHtml(id) {
     return `<div class="entry" id="${id}">
             <div class="image_holder">
                 <img class="trip_image">
-                <div class="image_shadow">
-                    <div class="trip_name"></div>
+                <div class="image_cover">
+                    <h2 class="trip_name"></h2>
                     <div class="trip_due_days"></div>
+                     <div class="weather_forecast">
+                        <div class="weather_temps">*</div>
+                        <div class="weather_icon"></div>
+                     </div>
                 </div>
                 <div class="entry_actions">
                     <button type="button" class="button_save_entry">Save</button>
@@ -19,10 +23,6 @@ function getEntryHtml(id) {
                 <div class="dates_selection">
                     <input class="date_from" type="date" placeholder="FROM">
                     <input class="date_to" type="date" placeholder="FROM">
-                </div>
-                <div class="weather_forecast">
-                    <div class="weather_icon"></div>
-                    <div class="weather_temps"></div>
                 </div>
             </div>
         </div>`

@@ -43,8 +43,10 @@ function getClassFromWeatherCode(weather_code) {
             break;
         case 731:
             className = "dust"
+            break;
         case 800:
             className = "sun";
+            break;
         case 801:
         case 802:
         case 803:

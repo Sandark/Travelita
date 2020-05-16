@@ -28,6 +28,11 @@ function assignTripEntryFunctions(elementId, entryParams) {
     fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, generateDueDays);
     generateDueDays();
 
+    /* Request weather async once data is loaded */
+    setTimeout(() => {
+        requestWeather()
+    }, 0);
+
     /* Listen changes to city input field, create suggestion box based on retrieved data */
     citySearchInput.addEventListener("keyup", () => {
         closeAllSuggestions();
@@ -168,7 +173,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
         const diffDays = Math.abs(dateUtils.getDateDiffFromNow(startDate));
 
         if (diffDays >= 16) {
-            requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps);
+            requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps, weatherIcon);
         } else {
             requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weatherIcon);
         }
@@ -210,7 +215,7 @@ function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySear
 /* Request forecast of historical data for place using lat/lng data.
 *  In case of historical data - one year is withdrawn from requested date.
 * */
-function requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps) {
+function requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps, weatherIcon) {
     startDate.setDate(startDate.getDate());
     startDate.setFullYear(startDate.getFullYear() - 1);
 
@@ -218,9 +223,16 @@ function requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps) {
         start_date: startDate.toISOString().split('T')[0],
         lat: tripEntry.getAttribute("data-lat"),
         lng: tripEntry.getAttribute("data-lng")
-    }).then(response => {
-        weatherTemps.innerText = `Usual weather:\n${response.min_temp}°C / ${response.max_temp}°C`;
     })
+        .then(response => {
+            if (response.code === 200 || response.code === 304 || response.code === undefined) {
+                weatherIcon.classList.remove(...weatherIcon.classList);
+                weatherIcon.classList.add("clouds", "weather_icon");
+                weatherTemps.innerText = `${response.min_temp}°C / ${response.max_temp}°C`;
+            } else {
+                weatherTemps.innerText = `City is missing`;
+            }
+        })
 }
 
 function requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weatherIcon) {
@@ -228,9 +240,14 @@ function requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weat
         lat: tripEntry.getAttribute("data-lat"),
         lng: tripEntry.getAttribute("data-lng")
     }).then(response => {
-        let temperatureAtFirstDay = response[diffDays];
-        weatherTemps.innerText = `Forecast:\n${temperatureAtFirstDay.min_temp}°C / ${temperatureAtFirstDay.max_temp}°C`;
-        weatherIcon.classList.add(weatherCodesMapping.getClassFromWeatherCode(temperatureAtFirstDay.weather_code));
+        if (response.code === 200 || response.code === 304 || response.code === undefined) {
+            let temperatureAtFirstDay = response[diffDays];
+            weatherTemps.innerText = `${temperatureAtFirstDay.min_temp}°C / ${temperatureAtFirstDay.max_temp}°C`;
+            weatherIcon.classList.remove(...weatherIcon.classList);
+            weatherIcon.classList.add(weatherCodesMapping.getClassFromWeatherCode(temperatureAtFirstDay.weather_code), "weather_icon");
+        } else {
+            weatherTemps.innerText = `City is missing`;
+        }
     })
 }
 
