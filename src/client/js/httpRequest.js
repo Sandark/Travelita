@@ -4,7 +4,7 @@ async function getRequest(url, params = "") {
     let compiledUrl = new URL(getApiBaseUrl() + url);
     Object.keys(params).forEach(key => compiledUrl.searchParams.append(key, params[key]));
 
-    let res = await fetch(compiledUrl);
+    let res = await fetch(compiledUrl.toString());
     try {
         return await res.json();
     } catch (error) {
@@ -48,6 +48,7 @@ async function deleteRequest(url, id) {
     });
 }
 
+/* Retrieves current base url */
 function getApiBaseUrl() {
     if (window.location.hostname === "localhost") {
         return "http://" + [window.location.hostname, window.location.port].join(":")

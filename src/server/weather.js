@@ -58,7 +58,6 @@ const getWeatherHistory = (req, res) => {
             message: "Lat/Lng parameters are missing or wrong"
         })
     } else {
-
         let url = support.compileUrl(historicalBaseUrl, params);
 
         httpRequest.httpsGet(url,

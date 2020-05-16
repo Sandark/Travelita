@@ -31,7 +31,6 @@ function processExternalRequest(externalResponse, callback, errorCallback) {
     })
 }
 
-
 module.exports = {
     httpGet,
     httpsGet
