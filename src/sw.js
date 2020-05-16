@@ -1,4 +1,6 @@
 import {precacheAndRoute} from 'workbox-precaching/precacheAndRoute'
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 precacheAndRoute(self.__WB_MANIFEST)
 
@@ -16,14 +18,11 @@ self.addEventListener("install", (e) => {
 })
 
 self.addEventListener("fetch", (e) => {
-    e.respondWith(caches.match(e.request)
-        .then((response) => {
-            if (response)
-                return response
-            else
-                return fetch(e.request).catch(e => console.error(e));
-        }))
-        .catch(e => {
-            console.error(e)
-        });
+    e.respondWith(async function() {
+        try {
+            return await fetch(e.request);
+        } catch (err) {
+            return caches.match(e.request);
+        }
+    }());
 })

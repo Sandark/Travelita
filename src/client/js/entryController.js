@@ -245,7 +245,7 @@ function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySear
     }
 
     if (entryParams.items) {
-        document.querySelectorAll(".item_wrap").forEach(n => n.parentNode.removeChild(n));
+        packageItems.querySelectorAll(".item_wrap").forEach(n => n.parentNode.removeChild(n));
         let tempFragment = document.createDocumentFragment();
         entryParams.items.forEach(item => {
             tempFragment.appendChild(createNewPackageItem(item.id, item.item_description));

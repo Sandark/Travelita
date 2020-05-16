@@ -33,11 +33,11 @@ const getTrips = (request, response) => {
 /* Retrieves trips with package items*/
 const getTripsWithItems = (request, response) => {
     let query = `select t.*, (select json_agg(json_build_object('id', p.id, 'trip_id', p.trip_id,
-                                                                     'item_description', p.item_description))
-                                   from package_item p
-                                   where t.id = p.trip_id) as items
-                    from trip t
-                    group by t.id`;
+                                               'item_description', p.item_description))
+                             from package_item p
+                             where t.id = p.trip_id) as items
+                 from trip t
+                 order by t.from_date asc`;
 
     pool.query(query, (error, results) => {
         if (error) {
@@ -105,7 +105,7 @@ const updateTrip = (request, response) => {
 
 /* Updates/Inserts package items depending on id state */
 const adjustItems = (tripId, items) => {
-    let itemsUpdateQuery = items.map(i => `(${i.id === null ? "nextval('id_sequence')" : i.id}, ${i.tripId}, '${i.description}')`).join(",");
+    let itemsUpdateQuery = items.map(i => `(${i.id === null ? "nextval('id_sequence')" : i.id}, ${tripId}, '${i.description}')`).join(",");
     if (itemsUpdateQuery !== "") {
         pool.query(`insert into package_item (id, trip_id, item_description) values ${itemsUpdateQuery} on conflict (id) do update set trip_id = excluded.trip_id, item_description = excluded.item_description`);
     }
