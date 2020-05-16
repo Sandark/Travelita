@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
     res.sendFile("dist/index.html");
 })
 
+/* Accessing postgres DB */
 app.get("/trips", queries.getTrips);
 
 app.get("/tripsWithItems", queries.getTripsWithItems);
@@ -42,6 +43,7 @@ app.delete("/trips/:id", queries.deleteTrip);
 
 app.delete("/items/:id", queries.deleteItem);
 
+/* Accessing external apis through node server */
 app.get("/city", location.searchForCity);
 
 app.get("/img", pixabay.findImageForCity);

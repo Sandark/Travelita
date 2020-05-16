@@ -7,7 +7,7 @@ const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plug
 const {InjectManifest} = require("workbox-webpack-plugin");
 
 module.exports = {
-    mode: "development",
+    mode: "production",
     entry: ["./src/client/index.js"],
     output: {
         libraryTarget: "var",

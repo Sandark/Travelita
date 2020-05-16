@@ -34,6 +34,17 @@ Node.js + Express + Postgres
 
 dotenv is used to get environment variables from `.env` file
 
+### NPM scripts
+
+'clean' - cleans up dist folder and creates an empty one
+'start' - starts node server
+'build-server' - runs build-dev and starts the server
+'build-dev' - builds project using development configuration
+'dev-server' - runs webpack development server
+'build-prod' - builds project using production configuration, optimizations are enabled
+'heroku-postbuild' - for Heroku deployment
+'test' - runs Jest tests
+
 ### API
 
 Server side exposes REST API endpoints to work with trip and package item entites, as well as accessing external APIs through node server.
