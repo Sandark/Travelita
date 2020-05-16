@@ -2,6 +2,7 @@ const Pool = require("pg").Pool;
 
 let dbOptions = {};
 
+/* create connection properties for DB */
 if (process.env.DATABASE_URL !== undefined) {
     dbOptions = {
         connectionString: process.env.DATABASE_URL
@@ -19,6 +20,7 @@ if (process.env.DATABASE_URL !== undefined) {
 
 const pool = new Pool(dbOptions);
 
+/* Retrieves trips without package items */
 const getTrips = (request, response) => {
     pool.query('SELECT * FROM TRIP ORDER BY ID ASC', (error, results) => {
         if (error) {
@@ -28,6 +30,7 @@ const getTrips = (request, response) => {
     })
 }
 
+/* Retrieves trips with package items*/
 const getTripsWithItems = (request, response) => {
     let query = `select t.*, (select json_agg(json_build_object('id', p.id, 'trip_id', p.trip_id,
                                                                      'item_description', p.item_description))
@@ -44,7 +47,7 @@ const getTripsWithItems = (request, response) => {
     })
 }
 
-
+/* Retrieves trip by id without package items */
 const getTripById = (request, response) => {
     const id = parseInt(request.params.id)
 
@@ -56,6 +59,7 @@ const getTripById = (request, response) => {
     })
 }
 
+/* Sub-query that used to retrieve updated trip with all package items after insert/update */
 const getTripByIdWithItemsQuery = (id) => {
     return `select t.*, (select json_agg(json_build_object('id', p.id, 'trip_id', p.trip_id,
                                                'item_description', p.item_description))
@@ -67,6 +71,7 @@ const getTripByIdWithItemsQuery = (id) => {
                 `;
 }
 
+/* Creates trip and all related package items*/
 const createTrip = (request, response) => {
     const {name, city_full_name, img_src, from_date, to_date, lat, lng, items} = request.body;
 
@@ -81,6 +86,7 @@ const createTrip = (request, response) => {
         });
 }
 
+/* Updates trip and all related package items */
 const updateTrip = (request, response) => {
     const id = parseInt(request.params.id)
     const {name, city_full_name, img_src, from_date, to_date, lat, lng, items} = request.body
@@ -99,6 +105,7 @@ const updateTrip = (request, response) => {
         });
 }
 
+/* Updates/Inserts package items depending on id state */
 const adjustItems = (tripId, items) => {
     // Delete items that not present in updated list
     let updatedIds = items.map(i => i.id).filter(i => i !== null).join(",")
@@ -114,6 +121,7 @@ const adjustItems = (tripId, items) => {
     }
 }
 
+/* Deletes single trip and all package items (cascade delete is setup on DB side) */
 const deleteTrip = (request, response) => {
     const id = parseInt(request.params.id)
 
@@ -125,6 +133,7 @@ const deleteTrip = (request, response) => {
     })
 }
 
+/* Deletes single item, used when user triggers item removal on UI */
 const deleteItem = (request, response) => {
     const id = parseInt(request.params.id)
 
