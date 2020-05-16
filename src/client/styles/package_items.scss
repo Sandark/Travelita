@@ -2,17 +2,10 @@
 
 .package_items {
   font-weight: 200;
+  padding: 15px;
 
   .item {
     font-weight: 200;
-  }
-
-  &::before {
-    border-top: 1px solid #b8b8b8;
-    margin: 2px 0;
-    width: 100%;
-    content: "";
-    display: inline-block;
   }
 
   .package_header {

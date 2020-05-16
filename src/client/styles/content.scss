@@ -23,6 +23,22 @@
     animation-duration: 1s;
     margin: 8px;
 
+    .left_panel {
+      width: 100%;
+    }
+
+    .right_panel {
+      width: 100%;
+
+      &::before {
+        border-top: 1px solid #b8b8b8;
+        margin: 2px 0;
+        width: 100%;
+        content: "";
+        display: inline-block;
+      }
+    }
+
     .image_holder {
       width: 100%;
       position: relative;
@@ -196,7 +212,30 @@
 @include middle_screen {
   .travel_content {
     .entry {
-      width: calc(100% / 2 - 24px);
+      width: calc(100% - 24px);
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: start;
+
+      .left_panel {
+        width: 60%;
+      }
+
+      .right_panel {
+        width: 40%;
+
+        &::before {
+          content: none;
+        }
+      }
+
+      .image_holder {
+        border-top-right-radius: 0;
+
+        .image_cover {
+          border-top-right-radius: 0;
+        }
+      }
     }
   }
 }
@@ -204,7 +243,30 @@
 @include big_screen {
   .travel_content {
     .entry {
-      width: calc(100% / 2 - 24px);
+      width: calc(100% - 24px);
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: start;
+
+      .left_panel {
+        width: 60%;
+      }
+
+      .right_panel {
+        width: 40%;
+
+        &::before {
+          content: none;
+        }
+      }
+
+      .image_holder {
+        border-top-right-radius: 0;
+
+        .image_cover {
+          border-top-right-radius: 0;
+        }
+      }
     }
   }
 }
