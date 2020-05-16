@@ -6,7 +6,7 @@ const travelEntries = document.querySelector(".travel_content");
 
 /* Load existing data */
 setTimeout(() => {
-    httpRequest.getRequest("/trips")
+    httpRequest.getRequest("/tripsWithItems")
         .then(trips => {
             trips.forEach(trip => {
                 createEntry(trip)

@@ -39,6 +39,8 @@ app.put("/trips/:id", queries.updateTrip);
 
 app.delete("/trips/:id", queries.deleteTrip);
 
+app.delete("/items/:id", queries.deleteItem);
+
 app.get("/city", location.searchForCity);
 
 app.get("/img", pixabay.findImageForCity);

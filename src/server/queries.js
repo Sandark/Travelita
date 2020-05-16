@@ -82,7 +82,8 @@ const updateTrip = (request, response) => {
             if (error) {
                 throw error
             }
-            response.status(200).send(`Trip modified with ID: ${id}`)
+            response.status(200).json({
+                message: `Trip modified with ID: ${id}`});
         }
     )
 }
@@ -98,11 +99,23 @@ const deleteTrip = (request, response) => {
     })
 }
 
+const deleteItem = (request, response) => {
+    const id = parseInt(request.params.id)
+
+    pool.query('delete from package_item where id = $1', [id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).send(`Item deleted with ID: ${id}`)
+    })
+}
+
 module.exports = {
     getTrips,
     getTripsWithItems,
     getTripById,
     createTrip,
     updateTrip,
-    deleteTrip
+    deleteTrip,
+    deleteItem
 }

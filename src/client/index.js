@@ -12,7 +12,9 @@ import "./styles/global.scss";
 import "./styles/main.scss";
 import "./styles/content.scss";
 import "./styles/weather_forecast.scss";
+import "./styles/package_items.scss";
 
+/* import all images from img folder*/
 function importAll(r) {
     let images = {};
     r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });

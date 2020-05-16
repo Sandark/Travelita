@@ -21,11 +21,13 @@ function assignTripEntryFunctions(elementId, entryParams) {
     const dateTo = tripEntry.getElementsByClassName("date_to")[0];
     const deleteEntryButton = tripEntry.getElementsByClassName("button_delete_entry")[0];
     const saveEntryButton = tripEntry.getElementsByClassName("button_save_entry")[0];
+    const packageItems = tripEntry.getElementsByClassName("package_items")[0];
+    const addItemButton = tripEntry.querySelector(".button_add_item");
 
     let suggestionDiv;
 
     /* Fill entry with initial data if params are provided */
-    fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, generateDueDays);
+    fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, packageItems);
     generateDueDays();
 
     /* Request weather async once data is loaded */
@@ -50,30 +52,6 @@ function assignTripEntryFunctions(elementId, entryParams) {
             })
         }, waitTime);
     });
-
-    function createSuggestionBox(v) {
-        closeAllSuggestions();
-        suggestionDiv = document.createElement("div");
-        suggestionDiv.classList.add("suggestion_box");
-        v.geonames.map(g => {
-            let cityFullName = [g.toponymName, g.countryName].join(",");
-
-            let cityAnchor = document.createElement("a");
-            cityAnchor.setAttribute("data-city", g.toponymName);
-            cityAnchor.setAttribute("data-name", cityFullName);
-            cityAnchor.setAttribute("data-lng", g.lng);
-            cityAnchor.setAttribute("data-lat", g.lat);
-            cityAnchor.text = cityFullName;
-
-            cityAnchor.addEventListener("click", applyCity);
-
-            return cityAnchor;
-        }).forEach(a => {
-            suggestionDiv.appendChild(a);
-        });
-
-        citySearch.appendChild(suggestionDiv);
-    }
 
     async function applyCity(evt) {
         let e = evt || window.event;
@@ -138,7 +116,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
         generateDueDays();
         requestWeather();
-    })
+    });
 
     dateTo.addEventListener("change", () => {
         if (dateTo.valueAsDate < dateFrom.valueAsDate) {
@@ -147,7 +125,11 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
         generateDueDays();
         requestWeather();
-    })
+    });
+
+    addItemButton.addEventListener("click", () => {
+        packageItems.appendChild(createNewPackageItem());
+    });
 
     function closeAllSuggestions() {
         let allSuggestions = document.getElementsByClassName("suggestion_box");
@@ -178,12 +160,36 @@ function assignTripEntryFunctions(elementId, entryParams) {
             requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weatherIcon);
         }
     }
+
+    function createSuggestionBox(v) {
+        closeAllSuggestions();
+        suggestionDiv = document.createElement("div");
+        suggestionDiv.classList.add("suggestion_box");
+        v.geonames.map(g => {
+            let cityFullName = [g.toponymName, g.countryName].join(",");
+
+            let cityAnchor = document.createElement("a");
+            cityAnchor.setAttribute("data-city", g.toponymName);
+            cityAnchor.setAttribute("data-name", cityFullName);
+            cityAnchor.setAttribute("data-lng", g.lng);
+            cityAnchor.setAttribute("data-lat", g.lat);
+            cityAnchor.text = cityFullName;
+
+            cityAnchor.addEventListener("click", applyCity);
+
+            return cityAnchor;
+        }).forEach(a => {
+            suggestionDiv.appendChild(a);
+        });
+
+        citySearch.appendChild(suggestionDiv);
+    }
 }
 
 /**
  * Once data is provided from server side - information can be inserted in DOM
  */
-function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo) {
+function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, packageItems) {
     if (entryParams.id) {
         tripEntry.setAttribute("data-id", entryParams.id);
     }
@@ -210,6 +216,49 @@ function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySear
         tripEntry.setAttribute("data-lat", entryParams.lat);
         tripEntry.setAttribute("data-lng", entryParams.lng);
     }
+
+    if (entryParams.items) {
+        let tempFragment = document.createDocumentFragment();
+        entryParams.items.forEach(item => {
+            tempFragment.appendChild(createNewPackageItem(item.id, item.description));
+        })
+
+        packageItems.appendChild(tempFragment);
+    }
+}
+
+function createNewPackageItem(id, description) {
+    let newItem = document.createElement("input");
+    newItem.setAttribute("type", "text");
+    newItem.setAttribute("maxLength", 50);
+    newItem.placeholder = "Add item";
+    newItem.classList.add("item");
+
+    if (id) {
+        newItem.setAttribute("data-id", id);
+    }
+
+    if (description) {
+        newItem.value = description;
+    }
+
+    const inputWrap = document.createElement("div");
+    inputWrap.classList.add("item_wrap");
+    const removeItem = document.createElement("button");
+    removeItem.classList.add("button_remove_item");
+    removeItem.type = "button";
+
+    removeItem.addEventListener("click", () => {
+        if (newItem.getAttribute("data-id")) {
+            httpRequest.deleteRequest("/items", newItem.getAttribute("data-id"))
+                .then(res => console.debug(res));
+        }
+        inputWrap.parentNode.removeChild(inputWrap);
+    })
+
+    inputWrap.append(newItem, removeItem);
+
+    return inputWrap;
 }
 
 /* Request forecast of historical data for place using lat/lng data.

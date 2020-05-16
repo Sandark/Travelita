@@ -24,6 +24,12 @@ function getEntryHtml(id) {
                     <input class="date_from" type="date" placeholder="FROM">
                     <input class="date_to" type="date" placeholder="FROM">
                 </div>
+                <div class="package_items">
+                    <div class="package_header">
+                        <h3 class="package_title">Package items</h3>
+                        <button type="button" class="button_add_item">Add</button>
+                    </div>
+                </div>
             </div>
         </div>`
 }
