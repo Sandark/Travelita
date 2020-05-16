@@ -53,35 +53,10 @@ function assignTripEntryFunctions(elementId, entryParams) {
         }, waitTime);
     });
 
-    async function applyCity(evt) {
-        let e = evt || window.event;
-        let target = e.target || e.srcElement;
-
-        closeAllSuggestions();
-        citySearchInput.value = target.getAttribute("data-name");
-        tripEntry.setAttribute("data-lat", target.getAttribute("data-lat"));
-        tripEntry.setAttribute("data-lng", target.getAttribute("data-lng"));
-        tripName.textContent = target.getAttribute("data-city");
-
-        await httpRequest.getRequest("/img", {q: target.getAttribute("data-city")})
-            .then(async response => {
-                if (response.total === 0) {
-                    return await httpRequest.getRequest("/img", {q: "travel"});
-                }
-                return response;
-            }).then(response => {
-                tripImage.src = response.hits[Math.floor(Math.random() * response.hits.length)].webformatURL;
-                tripImage.alt = target.getAttribute("data-city");
-            }).then(() => {
-                requestWeather();
-            });
-    }
-
     deleteEntryButton.addEventListener("click", () => {
         tripEntry.parentNode.removeChild(tripEntry);
         if (tripEntry.getAttribute("data-id")) {
-            httpRequest.deleteRequest("/trips", tripEntry.getAttribute("data-id"))
-                .then(res => console.log(res));
+            httpRequest.deleteRequest("/trips", tripEntry.getAttribute("data-id"));
         }
     });
 
@@ -171,7 +146,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
         }
         let startDate = dateFrom.valueAsDate;
 
-        const diffDays = Math.abs(dateUtils.getDateDiffFromNow(startDate));
+        const diffDays = Math.abs(dateUtils.getDateDiff(startDate));
 
         if (diffDays >= 16) {
             requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps, weatherIcon);
@@ -180,18 +155,20 @@ function assignTripEntryFunctions(elementId, entryParams) {
         }
     }
 
+    /* Creates suggestion box with options from location request. User can select option that fit by clicking on it*/
     function createSuggestionBox(v) {
         closeAllSuggestions();
         suggestionDiv = document.createElement("div");
         suggestionDiv.classList.add("suggestion_box");
-        v.geonames.map(g => {
-            let cityFullName = [g.toponymName, g.countryName].join(",");
+        v.geonames.map(geo => {
+            let cityFullName = [geo.toponymName, geo.countryName].join(",");
 
             let cityAnchor = document.createElement("a");
-            cityAnchor.setAttribute("data-city", g.toponymName);
+            cityAnchor.setAttribute("data-city", geo.toponymName);
             cityAnchor.setAttribute("data-name", cityFullName);
-            cityAnchor.setAttribute("data-lng", g.lng);
-            cityAnchor.setAttribute("data-lat", g.lat);
+            cityAnchor.setAttribute("data-lng", geo.lng);
+            cityAnchor.setAttribute("data-lat", geo.lat);
+            cityAnchor.setAttribute("data-country", geo.countryName);
             cityAnchor.text = cityFullName;
 
             cityAnchor.addEventListener("click", applyCity);
@@ -202,6 +179,31 @@ function assignTripEntryFunctions(elementId, entryParams) {
         });
 
         citySearch.appendChild(suggestionDiv);
+    }
+
+    async function applyCity(evt) {
+        let e = evt || window.event;
+        let target = e.target || e.srcElement;
+
+        closeAllSuggestions();
+        citySearchInput.value = target.getAttribute("data-name");
+        tripEntry.setAttribute("data-lat", target.getAttribute("data-lat"));
+        tripEntry.setAttribute("data-lng", target.getAttribute("data-lng"));
+        tripEntry.setAttribute("data-country", target.getAttribute("data-country"));
+        tripName.textContent = target.getAttribute("data-city");
+
+        await httpRequest.getRequest("/img", {q: target.getAttribute("data-city")})
+            .then(async response => {
+                if (response.total === 0) {
+                    return await httpRequest.getRequest("/img", {q: tripEntry.getAttribute("data-country")});
+                }
+                return response;
+            }).then(response => {
+                tripImage.src = response.hits[Math.floor(Math.random() * response.hits.length)].webformatURL;
+                tripImage.alt = target.getAttribute("data-city");
+            }).then(() => {
+                requestWeather();
+            });
     }
 }
 
@@ -270,8 +272,7 @@ function createNewPackageItem(id, description) {
 
     removeItem.addEventListener("click", () => {
         if (newItem.getAttribute("data-id")) {
-            httpRequest.deleteRequest("/items", newItem.getAttribute("data-id"))
-                .then(res => console.debug(res));
+            httpRequest.deleteRequest("/items", newItem.getAttribute("data-id"));
         }
         inputWrap.parentNode.removeChild(inputWrap);
     })

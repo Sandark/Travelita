@@ -1,10 +1,10 @@
 /**
  * Calculates difference between provided date and now, returns integer value of difference.
- * @param targetDate
+ * @param startDate
  * @returns {number} returns negative if before now(), otherwise it's positive.
  */
-function getDateDiffFromNow(targetDate) {
-    const diffTime = targetDate - new Date();
+function getDateDiff(startDate, endDate = new Date()) {
+    const diffTime = startDate - endDate;
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
@@ -29,7 +29,7 @@ function generateDueDaysString(startDate, endDate) {
         return "";
     }
 
-    const diffDays = getDateDiffFromNow(startDate);
+    const diffDays = getDateDiff(startDate);
     let dueDaysValue;
 
     if (diffDays === 1) {
@@ -42,11 +42,13 @@ function generateDueDaysString(startDate, endDate) {
         dueDaysValue = calculatePastTripDiff(endDate);
     }
 
-    return dueDaysValue
+    const amountOfDays = Math.abs(getDateDiff(startDate, endDate)) + 1;
+
+    return dueDaysValue + `\n${amountOfDays} days long`;
 }
 
 function calculatePastTripDiff(endDate) {
-    const diffEndDays = getDateDiffFromNow(endDate);
+    const diffEndDays = getDateDiff(endDate);
 
     if (diffEndDays === 0) {
         return "Ending today";
@@ -58,7 +60,7 @@ function calculatePastTripDiff(endDate) {
 }
 
 module.exports = {
-    getDateDiffFromNow,
+    getDateDiff,
     formatDate,
     generateDueDaysString
 }
