@@ -1,0 +1,29 @@
+import {precacheAndRoute} from 'workbox-precaching/precacheAndRoute'
+
+precacheAndRoute(self.__WB_MANIFEST)
+
+let cache_name = "travelita"
+
+let urls_to_cache = [
+    "./",
+    "./tripsWithItems"
+]
+
+self.addEventListener("install", (e) => {
+    e.waitUntil(caches.open(cache_name).then((cache) => {
+        return cache.addAll(urls_to_cache)
+    }));
+})
+
+self.addEventListener("fetch", (e) => {
+    e.respondWith(caches.match(e.request)
+        .then((response) => {
+            if (response)
+                return response
+            else
+                return fetch(e.request).catch(e => console.error(e));
+        }))
+        .catch(e => {
+            console.error(e)
+        });
+})

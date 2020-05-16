@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin");
-const WorkboxPlugin = require("workbox-webpack-plugin");
+const {InjectManifest} = require("workbox-webpack-plugin");
 
 module.exports = {
     mode: "development",
@@ -40,6 +40,10 @@ module.exports = {
             filename: "./index.html"
         }),
         new MiniCssExtractPlugin({filename: 'main.css'}),
-        new WorkboxPlugin.GenerateSW()
+        new InjectManifest({
+            swSrc: "./src/sw.js",
+            swDest: "/service-worker.js",
+            exclude: ["/node_modules"]
+        })
     ],
 }
