@@ -10,18 +10,18 @@ function assignTripEntryFunctions(elementId, entryParams) {
     /* Retrieve all children of trip entry */
     const tripEntry = document.getElementById(elementId);
 
-    const tripImage = tripEntry.getElementsByClassName("trip_image")[0];
-    const tripName = tripEntry.getElementsByClassName("trip_name")[0];
-    const dueDays = tripEntry.getElementsByClassName("trip_due_days")[0];
-    const citySearch = tripEntry.getElementsByClassName("city_search")[0];
-    const citySearchInput = tripEntry.getElementsByClassName("city_search_input")[0];
-    const weatherTemps = tripEntry.getElementsByClassName("weather_temps")[0];
-    const weatherIcon = tripEntry.getElementsByClassName("weather_icon")[0];
-    const dateFrom = tripEntry.getElementsByClassName("date_from")[0];
-    const dateTo = tripEntry.getElementsByClassName("date_to")[0];
-    const deleteEntryButton = tripEntry.getElementsByClassName("button_delete_entry")[0];
-    const saveEntryButton = tripEntry.getElementsByClassName("button_save_entry")[0];
-    const packageItems = tripEntry.getElementsByClassName("package_items")[0];
+    const tripImage = tripEntry.querySelector(".trip_image");
+    const tripName = tripEntry.querySelector(".trip_name");
+    const dueDays = tripEntry.querySelector(".trip_due_days");
+    const citySearch = tripEntry.querySelector(".city_search");
+    const citySearchInput = tripEntry.querySelector(".city_search_input");
+    const weatherTemps = tripEntry.querySelector(".weather_temps");
+    const weatherIcon = tripEntry.querySelector(".weather_icon");
+    const dateFrom = tripEntry.querySelector(".date_from");
+    const dateTo = tripEntry.querySelector(".date_to");
+    const deleteEntryButton = tripEntry.querySelector(".button_delete_entry");
+    const saveEntryButton = tripEntry.querySelector(".button_save_entry");
+    const packageItems = tripEntry.querySelector(".package_items");
     const addItemButton = tripEntry.querySelector(".button_add_item");
 
     let suggestionDiv;
@@ -87,6 +87,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
     saveEntryButton.addEventListener("click", () => {
         let techId = tripEntry.getAttribute("data-id");
+
         const saveParams = {
             id: techId,
             name: tripName.innerText,
@@ -95,19 +96,41 @@ function assignTripEntryFunctions(elementId, entryParams) {
             from_date: dateFrom.valueAsDate,
             to_date: dateTo.valueAsDate,
             lat: tripEntry.getAttribute("data-lat"),
-            lng: tripEntry.getAttribute("data-lng")
+            lng: tripEntry.getAttribute("data-lng"),
+            items: retrieveItemsToPersist(techId)
         }
 
         if (techId) {
-            httpRequest.putRequest(`/trips/${techId}`, saveParams);
+            httpRequest.putRequest(`/trips/${techId}`, saveParams)
+                .then(upd => {
+                    fillEntryWithData(upd, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, packageItems);
+                });
         } else {
             httpRequest.postRequest("/trips", saveParams)
-                .then(res => {
-                    tripEntry.setAttribute("data-id", res.id);
-                    console.log(res.message);
+                .then(upd => {
+                    fillEntryWithData(upd, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, packageItems)
                 });
         }
     });
+
+
+    function retrieveItemsToPersist(tripId) {
+        let resultList = [];
+        if (packageItems.children[1]) {
+            for (const item of packageItems.querySelectorAll(".item")) {
+                if (item.value === "" || item.value === null || item.value === undefined) {
+                    continue;
+                }
+
+                resultList.push({
+                    id: item.getAttribute("data-id"),
+                    tripId: tripId,
+                    description: item.value
+                })
+            }
+        }
+        return resultList;
+    }
 
     dateFrom.addEventListener("change", () => {
         if (dateFrom.valueAsDate > dateTo.valueAsDate) {
@@ -139,10 +162,6 @@ function assignTripEntryFunctions(elementId, entryParams) {
     }
 
     function generateDueDays() {
-        if (dateFrom.valueAsDate === null || dateTo.valueAsDate === null) {
-            return;
-        }
-
         dueDays.innerText = dateUtils.generateDueDaysString(dateFrom.valueAsDate, dateTo.valueAsDate);
     }
 
@@ -218,9 +237,10 @@ function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySear
     }
 
     if (entryParams.items) {
+        document.querySelectorAll(".item_wrap").forEach(n => n.parentNode.removeChild(n));
         let tempFragment = document.createDocumentFragment();
         entryParams.items.forEach(item => {
-            tempFragment.appendChild(createNewPackageItem(item.id, item.description));
+            tempFragment.appendChild(createNewPackageItem(item.id, item.item_description));
         })
 
         packageItems.appendChild(tempFragment);

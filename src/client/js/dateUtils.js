@@ -25,6 +25,10 @@ function formatDate(date) {
  * @returns {string}
  */
 function generateDueDaysString(startDate, endDate) {
+    if (startDate === null || endDate === null) {
+        return "";
+    }
+
     const diffDays = getDateDiffFromNow(startDate);
     let dueDaysValue;
 
