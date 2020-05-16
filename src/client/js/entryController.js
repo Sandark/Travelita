@@ -2,10 +2,12 @@ const httpRequest = require("./httpRequest");
 const weatherCodesMapping = require("./weatherCodeMapping");
 const dateUtils = require("./dateUtils");
 
+/* Initialize Entry view with provided parameters and assign event handlers to elements */
 function assignTripEntryFunctions(elementId, entryParams) {
     let typingTimer;
-    const waitTime = 1000;
+    const waitTime = 500;
 
+    /* Retrieve all children of trip entry */
     const tripEntry = document.getElementById(elementId);
 
     const tripImage = tripEntry.getElementsByClassName("trip_image")[0];
@@ -22,35 +24,15 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
     let suggestionDiv;
 
-    if (entryParams.id) {
-        tripEntry.setAttribute("data-id", entryParams.id);
-    }
+    /* Fill entry with initial data if params are provided */
+    fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo, generateDueDays);
+    generateDueDays();
 
-    if (entryParams.img_src) {
-        tripImage.src = entryParams.img_src;
-    }
-
-    if (entryParams.name) {
-        tripName.innerText = entryParams.name;
-        tripImage.alt = entryParams.name;
-    }
-
-    if (entryParams.city_full_name) {
-        citySearchInput.value = entryParams.city_full_name;
-    }
-
-    if (entryParams.from_date !== undefined && entryParams.to_date !== undefined) {
-        dateFrom.value = dateUtils.formatDate(new Date(entryParams.from_date));
-        dateTo.value = dateUtils.formatDate(new Date(entryParams.to_date));
-        generateDueDays();
-    }
-
-    if (entryParams.lat !== undefined && entryParams.lng !== undefined) {
-        tripEntry.setAttribute("data-lat", entryParams.lat);
-        tripEntry.setAttribute("data-lng", entryParams.lng);
-    }
-
+    /* Listen changes to city input field, create suggestion box based on retrieved data */
     citySearchInput.addEventListener("keyup", () => {
+        closeAllSuggestions();
+        clearTimeout(typingTimer);
+
         typingTimer = setTimeout(() => {
             if (citySearchInput.value.length < 3) {
                 return;
@@ -88,10 +70,6 @@ function assignTripEntryFunctions(elementId, entryParams) {
         citySearch.appendChild(suggestionDiv);
     }
 
-    citySearchInput.addEventListener("keydown", () => {
-        clearTimeout(typingTimer);
-    })
-
     async function applyCity(evt) {
         let e = evt || window.event;
         let target = e.target || e.srcElement;
@@ -105,7 +83,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
         await httpRequest.getRequest("/img", {q: target.getAttribute("data-city")})
             .then(async response => {
                 if (response.total === 0) {
-                    return await getRequest("/img", {q: "travel"});
+                    return await httpRequest.getRequest("/img", {q: "travel"});
                 }
                 return response;
             }).then(response => {
@@ -178,32 +156,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
             return;
         }
 
-        const diffDays = dateUtils.getDateDiffs(dateFrom.valueAsDate, new Date());
-        let dueDaysValue;
-
-        if (diffDays === 1) {
-            dueDaysValue = "Tomorrow"
-        } else if (diffDays > 1) {
-            dueDaysValue = `In ${diffDays} days`;
-        } else if (diffDays === 0) {
-            dueDaysValue = "Today";
-        } else {
-            dueDaysValue = calculatePastTripDiff();
-        }
-
-        function calculatePastTripDiff() {
-            const diffEndDays = dateUtils.getDateDiffs(dateTo.valueAsDate, new Date());
-
-            if (diffEndDays === 0) {
-                return "Ending today";
-            } else if (diffEndDays > 0) {
-                return "Now";
-            } else {
-                return `${Math.abs(diffEndDays)} days away`;
-            }
-        }
-
-        dueDays.innerText = dueDaysValue;
+        dueDays.innerText = dateUtils.generateDueDaysString(dateFrom.valueAsDate, dateTo.valueAsDate);
     }
 
     function requestWeather() {
@@ -215,27 +168,70 @@ function assignTripEntryFunctions(elementId, entryParams) {
         const diffDays = Math.abs(dateUtils.getDateDiffs(startDate, new Date()));
 
         if (diffDays >= 16) {
-            startDate.setDate(startDate.getDate());
-            startDate.setFullYear(startDate.getFullYear() - 1);
-
-            httpRequest.getRequest("/weatherHistory", {
-                start_date: startDate.toISOString().split('T')[0],
-                lat: tripEntry.getAttribute("data-lat"),
-                lng: tripEntry.getAttribute("data-lng")
-            }).then(response => {
-                weatherTemps.innerText = `Usual weather:\n${response.min_temp}°C / ${response.max_temp}°C`;
-            })
+            requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps);
         } else {
-            httpRequest.getRequest("/weather", {
-                lat: tripEntry.getAttribute("data-lat"),
-                lng: tripEntry.getAttribute("data-lng")
-            }).then(response => {
-                let temperatureAtFirstDay = response[diffDays];
-                weatherTemps.innerText = `Forecast:\n${temperatureAtFirstDay.min_temp}°C / ${temperatureAtFirstDay.max_temp}°C`;
-                weatherIcon.classList.add(weatherCodesMapping.getClassFromWeatherCode(temperatureAtFirstDay.weather_code));
-            })
+            requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weatherIcon);
         }
     }
+}
+
+/**
+ * Once data is provided from server side - information can be inserted in DOM
+ */
+function fillEntryWithData(entryParams, tripEntry, tripImage, tripName, citySearchInput, dateFrom, dateTo) {
+    if (entryParams.id) {
+        tripEntry.setAttribute("data-id", entryParams.id);
+    }
+
+    if (entryParams.img_src) {
+        tripImage.src = entryParams.img_src;
+    }
+
+    if (entryParams.name) {
+        tripName.innerText = entryParams.name;
+        tripImage.alt = entryParams.name;
+    }
+
+    if (entryParams.city_full_name) {
+        citySearchInput.value = entryParams.city_full_name;
+    }
+
+    if (entryParams.from_date !== undefined && entryParams.to_date !== undefined) {
+        dateFrom.value = dateUtils.formatDate(new Date(entryParams.from_date));
+        dateTo.value = dateUtils.formatDate(new Date(entryParams.to_date));
+    }
+
+    if (entryParams.lat !== undefined && entryParams.lng !== undefined) {
+        tripEntry.setAttribute("data-lat", entryParams.lat);
+        tripEntry.setAttribute("data-lng", entryParams.lng);
+    }
+}
+
+/* Request forecast of historical data for place using lat/lng data.
+*  In case of historical data - one year is withdrawn from requested date.
+* */
+function requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps) {
+    startDate.setDate(startDate.getDate());
+    startDate.setFullYear(startDate.getFullYear() - 1);
+
+    httpRequest.getRequest("/weatherHistory", {
+        start_date: startDate.toISOString().split('T')[0],
+        lat: tripEntry.getAttribute("data-lat"),
+        lng: tripEntry.getAttribute("data-lng")
+    }).then(response => {
+        weatherTemps.innerText = `Usual weather:\n${response.min_temp}°C / ${response.max_temp}°C`;
+    })
+}
+
+function requestWeatherForecastFor16Days(tripEntry, diffDays, weatherTemps, weatherIcon) {
+    httpRequest.getRequest("/weather", {
+        lat: tripEntry.getAttribute("data-lat"),
+        lng: tripEntry.getAttribute("data-lng")
+    }).then(response => {
+        let temperatureAtFirstDay = response[diffDays];
+        weatherTemps.innerText = `Forecast:\n${temperatureAtFirstDay.min_temp}°C / ${temperatureAtFirstDay.max_temp}°C`;
+        weatherIcon.classList.add(weatherCodesMapping.getClassFromWeatherCode(temperatureAtFirstDay.weather_code));
+    })
 }
 
 module.exports = {
