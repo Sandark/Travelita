@@ -57,18 +57,20 @@
     }
 
     .button_remove_item {
-      width: 20px;
-      height: 20px;
+      width: 14px;
+      height: 14px;
       border: none;
       border-radius: 50%;
       outline: none;
       margin: 4px;
+      padding: 0;
+      cursor: pointer;
       text-align: center;
       text-transform: uppercase;
       font-weight: 700;
       position: relative;
       background: #ff6565 url("../img/delete.png") no-repeat center;
-      background-size: 12px;
+      background-size: 8px;
 
       &:hover, &:focus {
         background-color: #ff4c4c;

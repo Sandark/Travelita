@@ -91,8 +91,6 @@ const updateTrip = (request, response) => {
     const id = parseInt(request.params.id)
     const {name, city_full_name, img_src, from_date, to_date, lat, lng, items} = request.body
 
-    console.log(items);
-
     pool.query(
         'update trip set name = $2, city_full_name = $3, img_src = $4, from_date = $5, to_date = $6, lat = $7, lng = $8 where id = $1',
         [id, name, city_full_name, img_src, from_date, to_date, lat, lng])
@@ -107,17 +105,9 @@ const updateTrip = (request, response) => {
 
 /* Updates/Inserts package items depending on id state */
 const adjustItems = (tripId, items) => {
-    // Delete items that not present in updated list
-    let updatedIds = items.map(i => i.id).filter(i => i !== null).join(",")
-
-    let itemsUpdateQuery = items.filter(i => i.id !== null).map(i => `(${i.id}, ${i.tripId}, '${i.description}')`).join(",");
+    let itemsUpdateQuery = items.map(i => `(${i.id === null ? "nextval('id_sequence')" : i.id}, ${i.tripId}, '${i.description}')`).join(",");
     if (itemsUpdateQuery !== "") {
         pool.query(`insert into package_item (id, trip_id, item_description) values ${itemsUpdateQuery} on conflict (id) do update set trip_id = excluded.trip_id, item_description = excluded.item_description`);
-    }
-
-    let itemsQuery = items.filter(i => i.id === null).map(i => `(${i.tripId}, '${i.description}')`).join(",");
-    if (itemsQuery !== "") {
-        pool.query(`insert into package_item (trip_id, item_description) values ${itemsQuery}`);
     }
 }
 
