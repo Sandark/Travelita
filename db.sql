@@ -1,5 +1,5 @@
-drop table if exists trip;
 drop table if exists package_item;
+drop table if exists trip;
 
 create sequence if not exists id_sequence start 1001;
 
