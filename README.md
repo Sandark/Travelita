@@ -17,8 +17,8 @@ App is deployed on heroku - https://travelita.herokuapp.com and using Postgres D
 HTML5 + CSS3 + Vanilla JS
 
 Client has following functionality:
-1. Trip entries can be created/updated - using `save` button and deleted using `delete` button
-2. Package items can be added and will be persisted together with the trip. Can be added using `add` button in package section, and later removed using red cross icon to remove one 
+1. Trip entries can be created using `+` button, updated - `save` button and deleted using `delete` button
+2. Package items can be added and will be persisted together with the trip on click on `save`. Can be added using `add` button in package section, and later removed using red cross icon to remove one item record
 3. City search provides suggestion box from which user has to select proper city (this is required to retrieve proper lat/lon data that is used for weather request)
 4. Once city is selected - trip image will be update accordingly - either by city or, if not found, by country name
 5. Finally weather will be retrieved for specified dates. If specified dates are in next 16 days range - forecast will be used. Otherwise historical data from last year will be used to show what is the usual weather
@@ -33,6 +33,10 @@ Client uses service worker that persists information from fetching trips. If use
 Node.js + Express + Postgres
 
 dotenv is used to get environment variables from `.env` file
+
+### API
+
+Server side exposes REST API endpoints to work with trip and package item entites, as well as accessing external APIs through node server.
 
 ### Postgres DB
 
