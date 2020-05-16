@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/203106/82113206-f7e53300-975c-11ea-9edf-bb9238715d29.png" alt="Travelita logo"/>
+</p>
+
 # Travelita App
 
 Capstone project for FND written using nodejs, express, webpack and postgresql.
