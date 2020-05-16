@@ -3,11 +3,12 @@
   min-height: 80px;
   display: flex;
   flex-direction: row;
+  align-items: center;
 
   .weather_icon {
     width: 50px;
     height: 50px;
-    margin: 15px;
+    margin: 0 15px;
     flex-shrink: 0;
 
     &.sun {
@@ -50,6 +51,6 @@
   .weather_temps {
     font-size: 1.25em;
     font-weight: 200;
-    margin: 15px;
+    margin: 0 15px;
   }
 }
