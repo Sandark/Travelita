@@ -1,4 +1,5 @@
 const express = require("express");
+const compression = require("compression");
 const app = express();
 
 const dotenv = require("dotenv").config();
@@ -11,6 +12,7 @@ const location = require("./location");
 const pixabay = require("./pixabay");
 const weather = require("./weather");
 
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
