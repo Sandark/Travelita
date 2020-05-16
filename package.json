@@ -2,7 +2,7 @@
   "name": "travelita-app",
   "version": "1.0.0",
   "description": "Capstone project for FND written using nodejs, express, webpack and etc.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "clean": "rimraf ./dist && mkdir dist",
     "start": "node src/server/server.js",
@@ -10,7 +10,8 @@
     "build-dev": "webpack --config webpack.config.dev.js",
     "dev-server": "webpack-dev-server --config webpack.config.dev.js",
     "build-prod": "webpack --config webpack.config.prod.js",
-    "heroku-postbuild": "npm run clean && npm run build-prod"
+    "heroku-postbuild": "npm run clean && npm run build-prod",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -20,9 +21,9 @@
   "author": "Anton Verchenko <anton.verch@gmail.com> (https://github.com/Sandark)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Sandark/Travel-App-Project/issues"
+    "url": "https://github.com/Sandark/Travelita/issues"
   },
-  "homepage": "https://github.com/Sandark/Travel-App-Project#readme",
+  "homepage": "https://github.com/Sandark/Travelita#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
@@ -30,7 +31,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "pg": "^8.1.0",
+    "pg": "^8.2.1",
     "regenerator-runtime": "^0.13.5",
     "workbox-webpack-plugin": "^5.1.3"
   },
