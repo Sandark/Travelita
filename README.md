@@ -1,17 +1,32 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/203106/82113206-f7e53300-975c-11ea-9edf-bb9238715d29.png" alt="Travelita logo"/>
+  <a href="https://travelita.herokuapp.com/"><img src="https://user-images.githubusercontent.com/203106/82113206-f7e53300-975c-11ea-9edf-bb9238715d29.png" alt="Travelita logo"/></a>
 </p>
 
 # Travelita App
 
 Capstone project for FND written using nodejs, express, webpack and postgresql.
 
+App is deployed on heroku - https://travelita.herokuapp.com and using Postgres DB.
 
-## Client logic
+
+## Client side
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/203106/82126123-4ae9d500-97b3-11ea-8ad7-d9ca43300dfc.png" alt="Trip Entry"/>
 
 HTML5 + CSS3 + Vanilla JS
 
-If city is not found on Pixabay - random image by travel search criteria is used.
+Client allows the following:
+1. Trip entries can be created/updated - using `save` button and deleted using `delete` button
+2. Package items can be added and will be persisted together with the trip. Can be added using `add` button in package section, and later removed using red cross icon to remove one 
+3. City search provides suggestion box from which user has to select proper city (this is required to retrieve proper lat/lon data that is used for weather request)
+4. Once city is selected - trip image will be update accordingly - either by city or, if not found, by country name
+5. Finally weather will be retrieved for specified dates. If specified dates are in next 16 days range - forecast will be used. Otherwise historical data from last year will be used to show what is the usual weather
+6. UI has a flexible layout that is equally useful on mobile devices and desktops
+
+### Service worker
+
+Client uses service worker that persists information from fetching trips. If user offline he still can see latest trip entries.
 
 ## Server side
 
@@ -36,3 +51,7 @@ WeatherBit - provides forecast and historical information for specified location
 Geonames - information about cities/locations. Used to retrieve city and it's lat and lng parameters that later can be used by weatherApi. Can be found in `location.js`
 
 Pixabay - free webservice that provides images by different criterias. Used to get a picture of city or random travel image if city is missing in Pixabay. Can be found in `pixabay.js`
+
+## Tests
+
+Tests examples are provided to client and server side in `__test__` folders in under `src/client` and `src/server`
