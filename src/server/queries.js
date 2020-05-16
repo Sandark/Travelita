@@ -60,8 +60,8 @@ const updateTrip = (request, response) => {
     const {name, city_full_name, img_src, from_date, to_date, lat, lng} = request.body
 
     pool.query(
-        'UPDATE TRIP SET name = $1, city_full_name = $2, img_src = $3, from_date = $4, to_date = $5, lat = $6, lng = $7 WHERE id = $3',
-        [name, city_full_name, img_src, from_date, to_date, id, lat, lng],
+        'UPDATE TRIP SET name = $2, city_full_name = $3, img_src = $4, from_date = $5, to_date = $6, lat = $7, lng = $8 WHERE id = $1',
+        [id, name, city_full_name, img_src, from_date, to_date, lat, lng],
         (error, results) => {
             if (error) {
                 throw error

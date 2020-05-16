@@ -3,6 +3,9 @@ import "regenerator-runtime/runtime";
 
 import "./js/httpRequest";
 import "./js/weatherCodeMapping";
+import "./js/dateUtils"
+import "./js/entryView"
+import "./js/entryController"
 import "./js/app";
 
 import "./styles/global.scss";
