@@ -16,7 +16,7 @@ App is deployed on heroku - https://travelita.herokuapp.com and using Postgres D
 
 HTML5 + CSS3 + Vanilla JS
 
-Client allows the following:
+Client has following functionality:
 1. Trip entries can be created/updated - using `save` button and deleted using `delete` button
 2. Package items can be added and will be persisted together with the trip. Can be added using `add` button in package section, and later removed using red cross icon to remove one 
 3. City search provides suggestion box from which user has to select proper city (this is required to retrieve proper lat/lon data that is used for weather request)
