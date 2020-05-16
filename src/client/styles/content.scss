@@ -22,6 +22,12 @@
     animation-name: entry_creation;
     animation-duration: 1s;
     margin: 8px;
+    order: 1;
+
+    &.past_entry {
+      order: 100;
+      filter: grayscale(100%);
+    }
 
     .left_panel {
       width: 100%;

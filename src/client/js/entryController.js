@@ -138,6 +138,12 @@ function assignTripEntryFunctions(elementId, entryParams) {
 
     function generateDueDays() {
         dueDays.innerText = dateUtils.generateDueDaysString(dateFrom.valueAsDate, dateTo.valueAsDate);
+
+        if (dateUtils.getDateDiff(dateTo.valueAsDate) < 0) {
+            tripEntry.classList.add("past_entry");
+        } else {
+            tripEntry.classList.remove("past_entry");
+        }
     }
 
     function requestWeather() {
