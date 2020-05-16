@@ -42,7 +42,7 @@ input {
   outline: none;
 
   &:hover, &:focus {
-    border-bottom: 2px solid #5598ff;
+    border-bottom: 2px solid $active-input-color;
   }
 
   &::placeholder {

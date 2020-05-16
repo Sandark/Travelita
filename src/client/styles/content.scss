@@ -95,6 +95,7 @@
         width: 100%;
         background: #fff;
         z-index: 100;
+        border: 1px solid $active-input-color;
 
         a {
           padding: 4px 2px;
@@ -103,6 +104,11 @@
           color: #000000;
           cursor: pointer;
           font-family: inherit;
+          border-bottom: 1px solid $accent-color;
+
+          &:last-child {
+            border-bottom: none;
+          }
 
           &:hover {
             background: $accent-color;

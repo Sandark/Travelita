@@ -165,7 +165,7 @@ function assignTripEntryFunctions(elementId, entryParams) {
         }
         let startDate = dateFrom.valueAsDate;
 
-        const diffDays = Math.abs(dateUtils.getDateDiffs(startDate, new Date()));
+        const diffDays = Math.abs(dateUtils.getDateDiffFromNow(startDate));
 
         if (diffDays >= 16) {
             requestHistoricalWeatherForDate(startDate, tripEntry, weatherTemps);

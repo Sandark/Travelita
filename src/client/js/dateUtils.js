@@ -54,7 +54,7 @@ function calculatePastTripDiff(endDate) {
 }
 
 module.exports = {
-    getDateDiffs: getDateDiffFromNow,
+    getDateDiffFromNow,
     formatDate,
     generateDueDaysString
 }
