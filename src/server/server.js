@@ -29,6 +29,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/trips", queries.getTrips);
+app.get("/tripsWithItems", queries.getTripsWithItems);
 
 app.get("/trips/:id", queries.getTripById);
 
