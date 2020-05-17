@@ -8,6 +8,14 @@ Capstone project for FND written using nodejs, express, webpack and postgresql.
 
 App is deployed on heroku - https://travelita.herokuapp.com and using Postgres DB.
 
+Before use run `npm install` and `npm run build-dev`. Setup `.env` file with following configuration:
+
+`DATABASE_URL` - Postgres DB url to establish connection (more details in [Postgres DB](#postgres-db) section)
+`WEATHER_BIT_API_KEY` - api key for https://www.weatherbit.io/
+`PIXABAY_API_KEY` - api key for https://pixabay.com/
+`GEONAMES_API_KEY` - api key for https://www.geonames.org/
+
+Initial migration for DB is in `db.sql`.
 
 ## Client side
 
