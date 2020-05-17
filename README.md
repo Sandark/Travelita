@@ -59,9 +59,9 @@ Server side exposes REST API endpoints to work with trip and package item entite
 
 ### Postgres DB
 
-Postgres is used to provide CRUD operations for the application. 
+Postgres is used to store data. 
 
-Initial setup of db can be done using `db.sql`. It will create new tables and all required data.
+Initial setup of db can be done using `db.sql`. It will create new tables and required data.
 
 Server automatically setups DB connection:
 1. If process.env.DATABASE_URL is provided - it will be used to setup connection. E.g. it's useful on Heroku when they automaticall provide this URL to your application 
