@@ -64,7 +64,7 @@ const getWeatherHistory = (req, res) => {
             (data) => {
                 let result = JSON.parse(data);
                 
-                if (!result.error) {
+                if (result.error === undefined) {
                     res.json({
                         max_temp: result.data[0].max_temp,
                         min_temp: result.data[0].min_temp
