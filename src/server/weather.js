@@ -63,11 +63,18 @@ const getWeatherHistory = (req, res) => {
         httpRequest.httpsGet(url,
             (data) => {
                 let result = JSON.parse(data);
-
-                res.json({
-                    max_temp: result.data[0].max_temp,
-                    min_temp: result.data[0].min_temp
-                });
+                
+                if (!res.error) {
+                    res.json({
+                        max_temp: result.data[0].max_temp,
+                        min_temp: result.data[0].min_temp
+                    });
+                } else {
+                    res.json({
+                        max_temp: "NA",
+                        min_temp: "NA"
+                    });
+                }
             },
             (error) => res.json(error));
     }
