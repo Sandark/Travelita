@@ -5,8 +5,10 @@ let dbOptions = {};
 /* create connection properties for DB */
 if (process.env.DATABASE_URL !== undefined) {
     dbOptions = {
-        connectionString: process.env.DATABASE_URL
-        // ssl: true
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
     };
 } else {
     dbOptions = {
